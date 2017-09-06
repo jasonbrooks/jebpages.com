@@ -1,5 +1,5 @@
 languageCode = "en-us"
-#baseurl = "http://replace-this-with-your-hugo-site.com/"
+baseurl = $HUGO_BASE_URL
 title = "My New Hugo Site"
 theme = "hyde"
 relativeURL = true
