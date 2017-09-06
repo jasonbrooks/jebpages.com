@@ -1,5 +1,5 @@
 languageCode = "en-us"
-baseurl = $HUGO_BASE_URL
+baseurl = "http://jebpagescom-jebpages.7e14.starter-us-west-2.openshiftapps.com/"
 title = "My New Hugo Site"
 theme = "hyde"
 relativeURL = true
