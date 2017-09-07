@@ -39,7 +39,7 @@ type: post
 url: /2017/03/17/test-containerized-kube-and-system-container-based-flannel-and-etcd/
 ---
 
-<p><pre><br />
+<p><pre>
 $ git clone https://github.com/jasonbrooks/contrib.git<br />
 $ cd contrib<br />
 $ git checkout atomic-update<br />
@@ -55,7 +55,7 @@ kube-minion-test-[1:2].example.com</p>
 $ ./deploy-cluster.sh<br />
 </pre></p>
 <p>This will fail (if you use hostnames) at: <code>TASK [flannel : Load the flannel config file into etcd]</code> because we need <a href="https://github.com/projectatomic/atomic-system-containers/pull/44">this PR</a> in the Fedora etcd system container. You can work around by sshing into your master, and editing the resolv.conf inside of your etcd system container to match the host, exiting, and re-running the script.</p>
-<p><pre><br />
+<p><pre>
 $ ssh root@kube-master-test.example.com<br />
 # vi /var/lib/containers/atomic/etcd/rootfs/etc/resolv.conf<br />
 # exit<br />
@@ -63,7 +63,7 @@ $ ./deploy-cluster.sh<br />
 </pre></p>
 <p>That should work.</p>
 <p>This involves a <a href="https://github.com/kubernetes/contrib/compare/master...jasonbrooks:atomic-update">bunch of changes</a> to use docker containers for kube and use system containers for flannel and etcd. You can specify the registry, namespace and tag to use, as well as whether or not to containerize the master bits, the node bits, the etcd or the flannel using these extra options I've added to <code>inventory/group_vars/all.yml</code>:</p>
-<p><pre><br />
+<p><pre>
 container_registry: candidate-registry.fedoraproject.org<br />
 container_namespace: f25<br />
 container_label: latest</p>

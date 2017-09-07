@@ -35,18 +35,18 @@ url: /2016/09/20/upstream-hyperkube-rpm-edition/
 yum ones, changed the default baseimage to <code>centos:centos7</code>, and removed the gcloud-specifc push command.</p>
 <p>The script expects to get a freshly-built copy of the all-in-one <code>hyperkube</code> binary that wraps together all of the kubernetes components from your local system. I modded the Makefile to grab a pre-built (by the kubernetes project) copy of this binary if it doesn't exist on your machine.</p>
 <p>Here's how to make your own CentOS or Fedora-based kubernetes container, which you can then run using the directions under the heading "Containers from Upstream" from <a href="http://www.projectatomic.io/blog/2016/09/running-kubernetes-in-containers-on-atomic/">this post</a>:</p>
-<p><pre><br />
+<p><pre>
 $ git clone https://github.com/jasonbrooks/kubernetes.git </p>
 <p>$ git checkout hyperkube-rpm </p>
 <p>$ cd kubernetes/cluster/images/hyperkube </p>
 <p>$ make VERSION=v1.3.6<br />
 </pre></p>
 <p>That command would build a CentOS-based hyperkube container, targeting the 1.3.7 release. To build and push to your docker registry, you could use the command:</p>
-<p><pre><br />
+<p><pre>
 $ make push VERSION=v1.3.6 REGISTRY=&quot;YOUR-DOCKER-REGISTRY&quot;<br />
 </pre></p>
 <p>To build and push a Fedora-based container with the very latest kube beta container, you can bump the <code>VERSION</code> and add a <code>BASEIMAGE</code> argument:</p>
-<p><pre><br />
+<p><pre>
 $ make push VERSION=v1.4.0-beta.8 REGISTRY=&quot;YOUR-DOCKER-REGISTRY&quot; BASEIMAGE=fedora:24<br />
 </pre></p>
 <p>I tested out <code>v1.3.7</code> and <code>v1.4.0-beta.8</code>on CentOS Atomic, but hit <a href="https://github.com/google/cadvisor/issues/1461">this<br />
