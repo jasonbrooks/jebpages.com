@@ -56,44 +56,44 @@ url: /2016/08/15/running-kubernetes-in-containers-on-atomic/
 <h3>setting up flannel and etcd</h3>
 <p>You need a very recent version of the <code>atomic</code> command. I used a pair of CentOS Atomic Hosts running the <a href="https://wiki.centos.org/SpecialInterestGroup/Atomic/Devel">"continuous"</a> stream.</p>
 <p>The master host needs etcd and flannel:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # atomic pull gscrivano/etcd</p>
 <p># atomic pull gscrivano/flannel</p>
 <p># atomic install --system gscrivano/etcd<br />
-[/code]</p>
+</pre></p>
 <p>With etcd running, we can use it to configure flannel:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # export MASTER_IP=YOUR-MASTER-IP</p>
 <p># runc exec gscrivano-etcd etcdctl set /atomic.io/network/config &#039;{&quot;Network&quot;:&quot;172.17.0.0/16&quot;}&#039;</p>
 <p># atomic install --name=flannel --set FLANNELD_ETCD_ENDPOINTS=http://$MASTER_IP:2379 --system gscrivano/flannel<br />
-[/code]</p>
+</pre></p>
 <p>The worker node needs flannel as well:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # export MASTER_IP=YOUR-MASTER-IP</p>
 <p># atomic pull gscrivano/flannel</p>
 <p># atomic install --name=flannel --set ETCD_ENDPOINTS=http://$MASTER_IP:2379 --system gscrivano/flannel<br />
-[/code]</p>
+</pre></p>
 <p>On both the master and the worker, we need to make docker use flannel:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # echo &quot;/usr/libexec/flannel/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker&quot; | runc exec flannel bash<br />
-[/code]</p>
+</pre></p>
 <p>Also on both hosts, we need this docker tweak (<a href="https://github.com/kubernetes/kubernetes/issues/4869">because of this</a>):</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # cp /usr/lib/systemd/system/docker.service /etc/systemd/system/</p>
 <p># sed -i s/MountFlags=slave/MountFlags=/g /etc/systemd/system/docker.service</p>
 <p># systemctl daemon-reload</p>
 <p># systemctl restart docker<br />
-[/code]</p>
+</pre></p>
 <p>On both hosts, some context tweaks to make SELinux happy:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # mkdir -p /var/lib/kubelet/</p>
 <p># chcon -R -t svirt_sandbox_file_t /var/lib/kubelet/</p>
 <p># chcon -R -t svirt_sandbox_file_t /var/lib/docker/<br />
-[/code]</p>
+</pre></p>
 <h3>setting up kube</h3>
 <p>With flannel and etcd running in system containers, and with docker configured properly, we can start up kubernetes in containers. I've pulled the following docker run commands from the <a href="https://github.com/kubernetes/kube-deploy/tree/master/docker-multinode">docker-multinode</a> scripts in the kubernetes project's kube-deploy repository.</p>
 <p>On the master:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # docker run -d \<br />
 --net=host \<br />
 --pid=host \<br />
@@ -115,9 +115,9 @@ gcr.io/google_containers/hyperkube-amd64:$(curl -sSL &quot;https://storage.googl
 --cluster-domain=cluster.local \<br />
 --hostname-override=${MASTER_IP} \<br />
 --v=2<br />
-[/code]</p>
+</pre></p>
 <p>On the worker:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # export WORKER_IP=YOUR-WORKER-IP</p>
 <p># docker run -d \<br />
 --net=host \<br />
@@ -148,21 +148,21 @@ gcr.io/google_containers/hyperkube-amd64:$(curl -sSL &quot;https://storage.googl
 /hyperkube proxy \<br />
 --master=http://${MASTER_IP}:8080 \<br />
 --v=2<br />
-[/code]</p>
+</pre></p>
 <h3>get current kubectl</h3>
 <p>I usually test things out from the master node, so I'll download the newest stable kubectl binary to there:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # curl -sSL https://storage.googleapis.com/kubernetes-release/release/$(curl -sSL &quot;https://storage.googleapis.com/kubernetes-release/release/stable.txt&quot;)/bin/linux/amd64/kubectl &gt; /usr/local/bin/kubectl</p>
 <p># chmod +x /usr/local/bin/kubectl<br />
-[/code]</p>
+</pre></p>
 <h3>test it</h3>
 <p>It takes a few minutes for all the containers to get up and running. Once they are, you can start running kubernetes apps. I typically test with the <a href="https://github.com/projectatomic/nulecule-library/tree/master/guestbookgo-atomicapp">guestbookgo atomicapp</a>:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # atomic run projectatomic/guestbookgo-atomicapp<br />
-[/code]</p>
+</pre></p>
 <p>Wait a few minutes, until <code>kubectl get pods</code> tells you that your guestbook and redis pods are running, and then:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # kubectl describe service guestbook | grep NodePort<br />
-[/code]</p>
+</pre></p>
 <p>Visiting the <code>NodePort</code> returned above at either my master or worker IP (these kube scripts configure both to serve as workers) gives me this:</p>
 <p>https://jebpages.files.wordpress.com/2016/08/guestbook-ftw.png</p>

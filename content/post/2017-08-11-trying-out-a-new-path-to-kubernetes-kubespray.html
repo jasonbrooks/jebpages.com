@@ -34,30 +34,30 @@ url: /2017/08/11/trying-out-a-new-path-to-kubernetes-kubespray/
 
 <p>I just came across this <a href="https://blog.openshift.com/kubernetes-little-guide-install-options">Little Guide to Kubernetes Install Options</a>, which covers a few options I’ve heard of, and a few options I haven’t heard of. It doesn’t mention the main way that I deploy Kubernetes, which is through the Ansible scripts from the <a href="https://github.com/kubernetes/contrib/tree/master/ansible">kubernetes/contrib</a> repository. The post does point to another Ansible-based option, though, and I wondered whether this one, called Kubespray (nee Kargo) would work with Atomic Hosts.</p>
 <p>I installed kubespray:</p>
-<p>[code lang="text"]<br />
+<p><pre><br />
 $ sudo pip2 install kubespray<br />
-[/code]</p>
+</pre></p>
 <p>I generated an inventory for a baremetal (actually VMs) cluster with one etcd host / kube master and two nodes:</p>
-<p>[code lang="text"]<br />
+<p><pre><br />
 $ kubespray prepare --nodes node2[ansible_ssh_host=cah-2.osas.lab] node3[ansible_ssh_host=cah-3.osas.lab] --etcds node1[ansible_ssh_host=cah-1.osas.lab] --masters node1[ansible_ssh_host=cah-1.osas.lab]<br />
-[/code]</p>
+</pre></p>
 <p>I deployed the cluster, providing the argument <code>-u root</code> because my ansible host was already set up to access my test VMs as root via ssh key:</p>
-<p>[code lang="text"]<br />
+<p><pre><br />
 $ kubespray deploy -u root<br />
-[/code]</p>
+</pre></p>
 <p>The ansible zoomed by, eventually ending with:</p>
-<p>[code lang="text"]<br />
+<p><pre><br />
 PLAY RECAP *********************************************************************<br />
 localhost : ok=3 changed=1 unreachable=0 failed=0<br />
 node1 : ok=393 changed=95 unreachable=0 failed=0<br />
 node2 : ok=333 changed=76 unreachable=0 failed=0<br />
 node3 : ok=303 changed=65 unreachable=0 failed=0</p>
 <p>Kubernetes deployed successfuly<br />
-[/code]</p>
+</pre></p>
 <p>I tested the cluster by deploying the guestbook go sample app, as is my custom, and sure enough, everything seemed to be working.</p>
 <p><img src="{{ site.baseurl }}/assets/guestbook-kubespray.png" alt="" /></p>
 <p>The biggest difference between this installation route and the one I usually take is the source of the containers. Where I typically run CentOS Atomic with Kubernetes rpms from the CentOS project or with containers based on those rpms, and the same with Fedora Atomic and Fedora-based content, the Kubespray installer set me up with container images mostly from CoreOS:</p>
-<p>[code lang="text"]<br />
+<p><pre><br />
 [root@cah-1 ~]# atomic containers list<br />
 CONTAINER ID IMAGE COMMAND CREATED STATE BACKEND RUNTIME<br />
 19d6514ceb1a quay.io/coreos/hyper /hyperkube controlle 2017-08-11 18:54 running docker docker<br />
@@ -71,5 +71,5 @@ a31b6a04be23 quay.io/coreos/hyper /hyperkube proxy --v 2017-08-11 18:52 running 
 877aa10ab6a4 gcr.io/google_contai /pause 2017-08-11 18:52 running docker docker<br />
 b9f64835b7e5 quay.io/coreos/hyper ./hyperkube kubelet 2017-08-11 18:52 running docker docker<br />
 1bab52292b2d quay.io/coreos/etcd: /usr/local/bin/etcd 2017-08-11 18:48 running docker docker<br />
-[/code]</p>
+</pre></p>
 <p>It's not a big deal <a href="https://github.com/kubernetes-incubator/kubespray/blob/master/roles/download/defaults/main.yml#L55">swapping out</a> one container source for another, however. Fedora and CentOS aren't providing a hyperkube container, which is what kubespray (and kubeadm, for that matter) look to use, but we could create one for Fedora and CentOS based on the <a href="https://github.com/kubernetes/kubernetes/blob/master/cluster/images/hyperkube/Dockerfile">upstream Dockerfile</a>.</p>

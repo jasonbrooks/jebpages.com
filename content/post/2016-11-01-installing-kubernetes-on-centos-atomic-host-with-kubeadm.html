@@ -38,7 +38,7 @@ url: /2016/11/01/installing-kubernetes-on-centos-atomic-host-with-kubeadm/
 <p>Using kubeadm is as simple as installing the tool on a set of servers, running <code>kubeadm init</code> to initialize a master for the cluster, and running <code>kubeadm join</code> on some nodes to join them to the cluster. With kubeadm, the kubelet is installed as a regular software package, and the rest of the components run as docker containers.</p>
 <p>The tool is available in packaged form for CentOS and for Ubuntu hosts, so I figured I'd avail myself of the <a href="http://www.projectatomic.io/blog/2016/07/hacking-and-extending-atomic-host/">package-layering capabilities</a> of <a href="https://wiki.centos.org/SpecialInterestGroup/Atomic/Devel">CentOS Atomic Host Continuous</a> to install the kubeadm rpm on a few of these hosts to get up and running with an up-to-date and mostly-containerized kubernetes cluster.</p>
 <p>However, I hit an issue trying to install one of the dependencies for kubeadm, kubernetes-cni:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # rpm-ostree pkg-add kubelet kubeadm kubectl kubernetes-cni<br />
 Checking out tree 060b08b... done</p>
 <p>Downloading metadata: [=================================================] 100%<br />
@@ -48,19 +48,19 @@ Will download: 5 packages (41.1 MB)</p>
 <p>Downloading from kubernetes: [========================================] 100%</p>
 <p>Importing: [============================================================] 100%<br />
 Overlaying... error: Unpacking kubernetes-cni-0.3.0.1-0.07a8a2.x86_64: openat: No such file or directory<br />
-[/code]</p>
+</pre></p>
 <p>It turns out that kubernetes-cni installs files to <code>/opt</code>, and rpm-ostree, the hybrid image/package system that underpins atomic hosts, <a href="https://github.com/projectatomic/rpm-ostree/issues/233">doesn't allow for this</a>. I managed to work around the issue by rolling my own copy of the kubeadm packages that included a kubernetes-cni package that installed its binaries to <code>/usr/lib/opt</code>, but I found that not only do kubernetes' network plugins expect to find the cni binaries in <code>/opt</code>, but they place their own binaries in there as needed, too. In an rpm-ostree system, <code>/usr</code> is read-only, so even if I modified the plugins to use <code>/usr/lib/opt</code>, they wouldn't be able to write to that location.</p>
 <p>I worked around this second issue by further modding my kubernetes-cni package to use <a href="https://fedoraproject.org/wiki/Packaging:Tmpfiles.d">tmpfiles.d</a>, a service for managing temporary files and runtime directories for daemons, to create symlinks from each of the cni binaries stored in <code>/usr/lib/opt/cni/bin</code> to locations in in <code>/opt/cni/bin</code>. You can see the changes I made to the spec file <a href="https://github.com/kubernetes/release/compare/master...jasonbrooks:atomic">here</a> and find a package based on these changes in this copr.</p>
 <p>I'm not positive that this is the best way to work around the problem, but it allowed me to get up and running with kubeadm on CentOS Atomic Host Continuous. Here's how to do that:</p>
 <p>This first step may or may not be crucial, I added it to my mix on the suggestion of <a href="http://kubernetes.io/docs/admin/kubeadm/">this kubeadm doc page</a> while I was puzzling over why the weave network plugin wasn't working.</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # cat &lt;&lt;EOF &gt; /etc/sysctl.d/k8s.conf<br />
 net.bridge.bridge-nf-call-ip6tables = 1<br />
 net.bridge.bridge-nf-call-iptables = 1<br />
 EOF<br />
-[/code]</p>
+</pre></p>
 <p>This set of steps adds my copr repo, overlays the needed packages, and kicks off a reboot for the overlay to take effect.</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # cat &lt;&lt;EOF &gt; /etc/yum.repos.d/jasonbrooks-kube-release-epel-7.repo<br />
 [jasonbrooks-kube-release]<br />
 name=Copr repo for kube-release owned by jasonbrooks<br />
@@ -74,18 +74,18 @@ enabled=1<br />
 enabled_metadata=1<br />
 EOF</p>
 <p># rpm-ostree pkg-add --reboot kubelet kubeadm kubectl kubernetes-cni<br />
-[/code]</p>
+</pre></p>
 <p>These steps start the kubelet service, put selinux into permissive mode, which, according to <a href="http://kubernetes.io/docs/getting-started-guides/kubeadm">this doc page</a> should soon not be necessary, and initializes the cluster.</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # systemctl enable kubelet.service --now</p>
 <p># setenforce 0</p>
 <p># kubeadm init --use-kubernetes-version &quot;v1.4.3&quot;<br />
-[/code]</p>
+</pre></p>
 <p>This step assigns the master node to also serve as a worker, and then deploys the weave network plugin on the cluster. To add additional workers, use the kubeadm join command provided when the cluster init operation completed.</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 # kubectl taint nodes --all dedicated-</p>
 <p># kubectl apply -f https://git.io/weave-kube<br />
-[/code]</p>
+</pre></p>
 <p>When the command <code>kubectl get pods --all-namespaces</code> shows that all of your pods are up and running, the cluster is ready for action.</p>
 <p>The kubeadm tool is considered an "alpha" right now, but moving forward, this looks like it could be a great way to come up with an up-to-date kube cluster on atomic hosts. I'll need to figure out whether my workaround to get kubernetes-cni working is sane enough before building a more official centos or fedora package for this, and I want to figure out how to swap out the project-built, debian-based kubernetes component containers with containers provided by centos or fedora, a topic I've <a href="https://jebpages.com/2016/09/20/upstream-hyperkube-rpm-edition/">written a bit about</a> recently.</p>
 <p><strong>update:</strong> While the hyperkube containers that I've written about in the past were based on debian, the containers that kubeadm downloads appear to be built on busybox.</p>

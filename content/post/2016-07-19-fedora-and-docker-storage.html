@@ -64,21 +64,21 @@ url: /2016/07/19/fedora-and-docker-storage/
 <h3>A Fix</h3>
 <p>You can cut back the size of the home volume in Fedora without too much trouble. I like to use system-storage-manager to work with my disks:</p>
 <p><em>NOTE: I guess I should add that whenever you're mucking with your disks, you should make sure you have backups, and so on, but I have resized my own laptop partitions in just this way on more than one occasion, and I've tested the steps written here with a VM as I wrote this, so, yeah.</em></p>
-<p>[code lang="text"]<br />
+<p><pre><br />
 $ sudo dnf install -y system-storage-manager<br />
-[/code]</p>
+</pre></p>
 <p>Next, reboot your machine, and when you get back to the login screen, hit CTRL-ALT-F2 to get to a virtual terminal, and then log in as root. We need to do this in order to unmount the home directory before we shrink it. As root, you can use system-storage-manager to shrink down the home volume. Below I'm shrinking the home volume to 20G, because I'm testing these instructions on a VM with a 100GB drive. Substitute a value that makes sense for your rig.</p>
-<p>[code lang="text"]<br />
+<p><pre><br />
 # umount /home<br />
 # ssm resize -s 20G /dev/fedora/home<br />
 # reboot<br />
-[/code]</p>
+</pre></p>
 <p>If you've already installed and run docker, you'll need to delete <code>/var/lib/docker</code>, where all of your containers and volumes live, so be prepared to rebuild those.</p>
-<p>[code lang="text"]<br />
+<p><pre><br />
 $ sudo systemctl stop docker<br />
 $ sudo rm -rf /var/lib/docker<br />
 $ sudo systemctl start docker<br />
-[/code]</p>
+</pre></p>
 <p>When docker starts up again, a <a href="https://github.com/projectatomic/docker-storage-setup">script that comes bundled</a> with Fedora's distribution of docker will check to see that there's space available in your volume group and will set up your storage correctly. If you want to grow your home volume later, it's easy to do and doesn't require unmounting anything. You'll run the same <code>ssm resize</code> command from above, and swap in your desired volume size.</p>
 <p><em>NOTE: If you're using docker-engine from docker.com, check out <a href="https://docs.docker.com/engine/userguide/storagedriver/device-mapper-driver/">these docs</a> for setting up devicemapper driver correctly by hand.</em></p>
 <h3>Starting out right</h3>

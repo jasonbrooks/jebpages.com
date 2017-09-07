@@ -34,71 +34,71 @@ url: /2012/02/15/how-to-get-up-and-running-with-ovirt/
 <p><em>(An aside: right now, oVirt is most closely aligned with Fedora, as the only current downstream distribution is Red Hat's RHEV. However, getting oVirt into as many distros as possible is a priority for the project, so let's hurry up and install this so we can get to work on Ubuntufication and openSUSEification and whatnot!)</em></p>
 <p>For my Fedora 16 test machine, I went with the minimal install option, and got rid of the separate /home partition that the Fedora installer creates by default, leaving that space instead to the root partition. For networking, I stuck to dhcp.</p>
 <p>After installing F16, start the network, set it to start in the future by default, and see what your IP address is:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 service network start &amp;&amp; chkconfig network on &amp;&amp; ifconfig -a<br />
-[/code]</p>
+</pre></p>
 <p>From there, ssh into your machine, where it's easier to cut and paste directions from the Web. Since I installed my system from the Fedora DVD, I yum update to install the ~79 updates that have been released since. <em>(And remind myself for the 1000th time to look into creating a local Fedora repository)</em></p>
 <p>Next, install wget (the minimal install doesn't come with it) and grab the repository file for oVirt Stable:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 yum install -y wget &amp;&amp; wget http://www.ovirt.org/releases/stable/fedora/16/ovirt-engine.repo -P /etc/yum.repos.d/<br />
-[/code]</p>
+</pre></p>
 <p><em>(I've been setting up my test installs using the root user, if you're logged in as a regular user, use sudo as needed)</em></p>
 <p>Then, install ovirt-engine, the management server for oVirt:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 yum install -y ovirt-engine<br />
-[/code]</p>
+</pre></p>
 <p><em>(on my minimal install, this step pulled in 100 packages)</em></p>
 <p>Next, run the setup script for oVirt Engine, cleverly tucked away under the name:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 engine-setup<br />
-[/code]</p>
+</pre></p>
 <p>The script asks a series of questions, and it's safe to stick with the defaults. The script will ask for your machine's fully-qualified domain name, and suggest its host name by default. If the name doesn't resolve properly, the script will ask if you're sure you want to proceed. It's OK to proceed anyway -- if you run into trouble you can work around it by modifying /etc/hosts, and for this single server config, well, your server knows where to find itself. Choose NFS as the default storage type, and let the script create an NFS iso share for you. I chose the path /mnt/iso and name 'iso'</p>
 <p><img src="{{ site.baseurl }}/assets/ovirt-setup.png" alt="ovirt-setup" /></p>
 <p>Type yes to proceed. When the script finishes, it'll tell you where to reach the ovirt web interface, at port 8080 or 8443 of your management server. Before we head over there, though, let's do a bit more storage configuration.</p>
 <p>In keeping with the all-in-one theme of this walkthrough, we're going to create three nfs shares on our management server: one for hosting the iso images from which we'll install VMs; one for hosting our VMs' hard disk images; and one for hosting a location to which we can export VMs images we may want to move between data domains. If you let the engine-setup script create an nfs share for you, you'll see this line in /etc/exports:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 /mnt/iso 0.0.0.0/0.0.0.0(rw) #rhev installer<br />
-[/code]</p>
+</pre></p>
 <p>Create two more like it:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 /mnt/data 0.0.0.0/0.0.0.0(rw)<br />
 /mnt/export 0.0.0.0/0.0.0.0(rw)<br />
-[/code]</p>
+</pre></p>
 <p>Then head over to /mnt to create the data and export directories:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 cd /mnt &amp;&amp; mkdir data export<br />
-[/code]</p>
+</pre></p>
 <p>All three of our storage folders need to be owned by user vdsm and group kvm. The iso folder that the engine-setup script created is already owned by vdsm:kvm -- the data and export directories we created need to match that:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 chown vdsm:kvm data export<br />
-[/code]</p>
+</pre></p>
 <p>Another NFS configuration bit here. oVirt wants to mount its NFS shares in v3, not v4&#046; You can ensure this either by disabling nfs v4 on the server side or on the client side, as described in the oVirt wiki, <a href="http://www.ovirt.org/wiki/Troubleshooting_NFS_Storage_Issues">here</a>. I've been disabling NFSv4 on my ovirt-engine boxes by adding this line to /etc/sysconfig/nfs, and then restarting the service:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 NFS4_SUPPORT=&quot;no&quot;</p>
 <p>systemctl restart nfs-server.service<br />
-[/code]</p>
+</pre></p>
 <p>Now we have a oVirt Engine management server and three NFS shares, and we're ready to add a host to handle the compute. Since this is a single-box install, we're going to configure our management server as a virtualization host. This step is based on the wiki page at <a href="http://www.ovirt.org/wiki/Installing_VDSM_from_rpm">http://www.ovirt.org/wiki/Installing_VDSM_from_rpm</a>. First, we install bridge-utils and create a network bridge:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 yum install -y bridge-utils</p>
 <p>vi /etc/sysconfig/network-scripts/ifcfg-ovirtmgmt<br />
-[/code]</p>
+</pre></p>
 <p>This is the contents of my bridge config file:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 DEVICE=ovirtmgmt<br />
 TYPE=Bridge<br />
 ONBOOT=yes<br />
 DELAY=0<br />
 BOOTPROTO=dhcp<br />
 NM_CONTROLLED=&quot;no&quot;<br />
-[/code]</p>
+</pre></p>
 <p>Then, to the config file for my network adapter, I add the line:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 BRIDGE=ovirtmgmt<br />
-[/code]</p>
+</pre></p>
 <p>And then, restart the network:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 service network restart<br />
-[/code]</p>
+</pre></p>
 <p><em>(Again, this is on my minimal install. If you're using a Fedora machine with NetworkManager enabled, you should also disable NM. Check the wiki for more info.)</em></p>
 <p>Now let's hit the oVirt Engine administrator portal, at :8080 or 8443&#046; If your server's host name doesn't resolve properly, you can add an entry in the /etc/hosts file of your client to route you in the right direction. Here's what you should see:</p>
 <p><img src="{{ site.baseurl }}/assets/hello_engine.png" alt="hello_engine" /></p>
@@ -112,9 +112,9 @@ service network restart<br />
 <p>An oVirt data center needs an active data domain before you can attach or add iso or export domains, which is why the iso domain that the engine-setup script creates starts out unattached. With your data domain in the green, you can click on that iso share, and then, in the pane that appears below the domains list, click the Data Center tab, then "Attach," and choose your default data center to attach the iso domain to. Next, click the "Default" entry in that same pane, and "Activate."</p>
 <p>Adding the export domain works in just the same way as adding the data domain, just make sure that you choose the export option from the "Domain Function / Storage Type" drop down menu.</p>
 <p>Now, let's add an iso image from which to install a VM. We do this from the command line, using the tool, engine-iso-uploader. On my test systems, I've used wget to fetch an iso image (in this example, the Fedora net install image) from the Internet to my oVirt Engine machine. From the directory where I've downloaded the image, I issue the command:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 engine-iso-uploader -i iso upload Fedora-16-x86_64-netinst.iso<br />
-[/code]</p>
+</pre></p>
 <p>The tool asks me for my admin password, the same one I use to log in to the web console, and starts uploading the image to my iso domain, which I've named "iso."  <em>(For more engine-iso-uploader guidance, see "man engine-iso-uploader")</em></p>
 <p>Once the upload is finished, I'm ready to create my VM. Click the virtual machines tab in the web admin, click new desktop (or server), give the machine a name, set the memory size, and adjust the cores, if you want. The OS list is limited right now to the RHEL and Windows options officially supported by RHEV, but I've installed Fedora, Ubuntu and Windows 8 without any trouble. For my F16 install, I chose RHEL 6.x x86_64 from the list:</p>
 <p><img src="{{ site.baseurl }}/assets/newvm.png" alt="newvm" /></p>
@@ -124,9 +124,9 @@ engine-iso-uploader -i iso upload Fedora-16-x86_64-netinst.iso<br />
 <p>We're ready to install our VM. With your VM selected, click the "Run Once" button, attach your install CD, bump up cd-rom in the boot sequence, and click OK:</p>
 <p><img src="{{ site.baseurl }}/assets/run_once.png" alt="run_once" /></p>
 <p>In order to access the console of our new VM, we're going to need to install the Firefox extension for spice. From a Fedora 16 machine with Firefox installed, you can install the spice package with:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 yum install -y spice-xpi<br />
-[/code]</p>
+</pre></p>
 <p>You may need to restart Firefox after installing the spice plugin, but once you're up and running with it, you'll be able to right-click on your VM and click "Console," which will bring up the spice console for your machine. From here, install your OS normally. In the spice console, you can hit Shift-F11 to enter/exit full screen mode, and Shift-12 to release your pointer if the console has captured it.</p>
 <p>The configuration changes you make in the "Run Once" dialog are supposed to last just once, but I've found that they persist until you actually shut down the machine--rebooting it once your install is complete isn't enough.</p>
 <p>I think that's it -- we have an all-in-one oVirt test box, complete with NFS storage and a guest machine. From here, you can add additional hosts, based on other Fedora hosts or on the project's stripped-down <a href="http://ovirt.org/releases/stable/binary/">oVirt Node</a> image. You can point your additional hosts at the NFS shares we created in this runthrough, or you can add new storage domains. Consult the <a href="http://www.ovirt.org/w/images/a/a9/OVirt-3.0-Installation_Guide-en-US.pdf">oVirt Installation guide</a> for more information on installing and configuring your oVirt environments. That's enough for this blog post, check back soon for more material on oVirt, and if you're interested in getting involved with the project, you can find all the mailing list, issue tracker, source repository, and wiki information you need <a href="http://www.ovirt.org/project/community/">here</a>. On IRC, I'm jbrooks, ping me in the #ovirt room on OFTC or write a comment below and I'll be happy to help you get up and running or get pointed in the right direction.</p>

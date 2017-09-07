@@ -39,19 +39,19 @@ url: /2016/02/05/testing-flannel/
 <p>I noticed today (maybe I've noticed before, but forgotten) that the version of <a href="https://github.com/coreos/flannel">flannel</a> in Fedora 23 is older than what's available in CentOS. It looks like this is because no one tested the more-recent version of flannel in Fedora's <a href="https://bodhi.fedoraproject.org">Bodhi</a>, a pretty awesome application for testing packages.</p>
 <p>Why not? Maybe because it isn't always obvious how to test a package like flannel, but I here's how I tested it, and added karma to the package in Bodhi.</p>
 <p>I use flannel when I <a href="http://www.projectatomic.io/blog/2015/09/clustering-atomic-hosts-with-kubernetes-ansible-and-vagrant/">cluster atomic hosts together</a> with kubernetes. I typically use the release versions of centos or fedora atomic, but the fedora project also provides an ostree image built from fedora's <a href="https://fedoraproject.org/wiki/QA:Updates&#095;Testing">updates-testing repo</a>, where packages await karma from testers. I prepare three atomic hosts with vagrant:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 [my-laptop]$ git clone https://github.com/jasonbrooks/contrib.git</p>
 <p>[my-laptop]$ cd contrib/ansible/vagrant</p>
 <p>[my-laptop]$ export DISTRO_TYPE=fedora-atomic</p>
 <p>[my-laptop]$ vagrant up --no-provision --provider=libvirt<br />
-[/code]</p>
+</pre></p>
 <p>Next, I rebase the trio of hosts to the testing tree:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 [my-laptop]$ for i in {kube-node-1,kube-master,kube-node-2}; do vagrant ssh $i -c &quot;sudo rpm-ostree rebase fedora-atomic:fedora-atomic/f23/x86_64/testing/docker-host&quot;; done</p>
 <p>[my-laptop]$ vagrant reload --no-provision &amp;&amp; vagrant provision kube-master<br />
-[/code]</p>
+</pre></p>
 <p>Reloading the hosts switches them to the testing image, and runs the ansible provisioning scripts that configure the kubernetes cluster. Now to ssh to one of the boxes, confirm that I'm running an image with the newer flannel, and then run a test app on the cluster to make sure that everything is in order:</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 [my-laptop]$ vagrant ssh kube-master</p>
 <p>[kube-master]$ rpm -q flannel<br />
 flannel-0.5.4-1.fc23.x86_64</p>
@@ -60,10 +60,10 @@ flannel-0.5.4-1.fc23.x86_64</p>
 * 2016-02-03 22:47:33     23.63     65cc265ae1     fedora-atomic     fedora-atomic:fedora-atomic/f23/x86_64/testing/docker-host<br />
   2016-01-26 18:16:33     23.53     22f0b303da     fedora-atomic     fedora-atomic:fedora-atomic/f23/x86_64/docker-host</p>
 <p>[kube-master]$ sudo atomic run projectatomic/guestbookgo-atomicapp<br />
-[/code]</p>
+</pre></p>
 <p>That last command pulls down an <a href="http://www.projectatomic.io/docs/atomicapp/">atomicapp</a> container that deploys a guestbook example app from the kubernetes project. The app includes two redis slaves, a redis master, and a trio of frontend apps that talk to those backend pieces. The bits of the app are spread between my two kubelet nodes, with flannel handling the networking in-between. If this app is working, then I'm confident that<br />
 flannel is working.</p>
-<p>[code lang=text]<br />
+<p><pre><br />
 [kube-master]$ kubectl get svc guestbook<br />
 NAME        CLUSTER_IP       EXTERNAL_IP   PORT(S)    SELECTOR        AGE<br />
 guestbook   10.254.233.237                 3000/TCP   app=guestbook   55m</p>
@@ -76,6 +76,6 @@ redis_git_sha1:00000000<br />
 redis_git_dirty:0<br />
 redis_build_id:c0359e7aa3798aa2<br />
 ....<br />
-[/code]</p>
+</pre></p>
 <p>The app is working, flannel appears to be doing its job, so I marched off to bodhi to offer up my karma:</p>
 <p><img src="{{ site.baseurl }}/assets/flannel-bodhi.png" alt="instant karma" title="instant karma" /></p>

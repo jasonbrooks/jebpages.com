@@ -34,7 +34,7 @@ url: /2017/04/11/testing-system-containerized-kube-and-friends/
 <li>I've been wanting to learn more about system containers for a little while now, and <a href="https://github.com/yuqi-zhang">Yu Qi (Jerry) Zhang</a> just wrote this <a href="https://fedoraproject.org/wiki/Container:System_Container">system container howto</a>.</li>
 </ul>
 <p>I've been testing on a trio of fedora atomic hosts like this:</p>
-<p>[code lang="text"]<br />
+<p><pre><br />
 $ git clone https://github.com/jasonbrooks/contrib.git<br />
 $ cd contrib<br />
 $ git checkout system-containers<br />
@@ -48,7 +48,7 @@ masters</p>
 kube-minion-test-[1:2].example.com</p>
 <p>$ cd scripts<br />
 $ ./deploy-cluster.sh<br />
-[/code]</p>
+</pre></p>
 <p>Substitute those hostnames above with ones that match your own test machines. Alternatively, you should be able to use the Vagrantfile in the <code>vagrant</code> directory of that repo, though I haven't tested that yet.</p>
 <p>This involves a <a href="https://github.com/kubernetes/contrib/compare/master...jasonbrooks:system-containers">bunch of changes</a> to run commands like <code>atomic install --system --name etcd {{ container_registry }}/{{ container_namespace }}/etcd:{{ container_label }}</code> to install flannel, etcd and kubernetes master and node components if desired and specified in the <code>inventory/group_vars/all.yml</code> file.</p>
 <p>In that same config file, I've temporarily turned off some of the newish encrypted flannel stuff, because I need to tweak the flannel container to make it work.</p>
