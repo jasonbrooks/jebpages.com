@@ -43,12 +43,12 @@ url: /2016/02/05/testing-flannel/
 [my-laptop]$ git clone https://github.com/jasonbrooks/contrib.git</p>
 <p>[my-laptop]$ cd contrib/ansible/vagrant</p>
 <p>[my-laptop]$ export DISTRO_TYPE=fedora-atomic</p>
-<p>[my-laptop]$ vagrant up --no-provision --provider=libvirt<br />
+<p>[my-laptop]$ vagrant up --no-provision --provider=libvirt
 </pre></p>
 <p>Next, I rebase the trio of hosts to the testing tree:</p>
 <p><pre>
 [my-laptop]$ for i in {kube-node-1,kube-master,kube-node-2}; do vagrant ssh $i -c &quot;sudo rpm-ostree rebase fedora-atomic:fedora-atomic/f23/x86_64/testing/docker-host&quot;; done</p>
-<p>[my-laptop]$ vagrant reload --no-provision &amp;&amp; vagrant provision kube-master<br />
+<p>[my-laptop]$ vagrant reload --no-provision &amp;&amp; vagrant provision kube-master
 </pre></p>
 <p>Reloading the hosts switches them to the testing image, and runs the ansible provisioning scripts that configure the kubernetes cluster. Now to ssh to one of the boxes, confirm that I'm running an image with the newer flannel, and then run a test app on the cluster to make sure that everything is in order:</p>
 <p><pre>
@@ -59,7 +59,7 @@ flannel-0.5.4-1.fc23.x86_64</p>
   TIMESTAMP (UTC)         VERSION   ID             OSNAME            REFSPEC<br />
 * 2016-02-03 22:47:33     23.63     65cc265ae1     fedora-atomic     fedora-atomic:fedora-atomic/f23/x86_64/testing/docker-host<br />
   2016-01-26 18:16:33     23.53     22f0b303da     fedora-atomic     fedora-atomic:fedora-atomic/f23/x86_64/docker-host</p>
-<p>[kube-master]$ sudo atomic run projectatomic/guestbookgo-atomicapp<br />
+<p>[kube-master]$ sudo atomic run projectatomic/guestbookgo-atomicapp
 </pre></p>
 <p>That last command pulls down an <a href="http://www.projectatomic.io/docs/atomicapp/">atomicapp</a> container that deploys a guestbook example app from the kubernetes project. The app includes two redis slaves, a redis master, and a trio of frontend apps that talk to those backend pieces. The bits of the app are spread between my two kubelet nodes, with flannel handling the networking in-between. If this app is working, then I'm confident that<br />
 flannel is working.</p>
@@ -75,7 +75,7 @@ redis_version:2.8.19<br />
 redis_git_sha1:00000000<br />
 redis_git_dirty:0<br />
 redis_build_id:c0359e7aa3798aa2<br />
-....<br />
+....
 </pre></p>
 <p>The app is working, flannel appears to be doing its job, so I marched off to bodhi to offer up my karma:</p>
 <p><img src="{{ site.baseurl }}/assets/flannel-bodhi.png" alt="instant karma" title="instant karma" /></p>
