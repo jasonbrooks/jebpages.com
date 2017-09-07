@@ -3,3 +3,12 @@ baseurl = "http://jebpagescom-jebpages.7e14.starter-us-west-2.openshiftapps.com/
 title = "jebpages"
 theme = "licorice"
 relativeURL = true
+
+[Author]
+  name = "Jason Brooks"
+  #email = "xxxxxxx"
+  #facebook = "username"
+  #googleplus = "+username" # or xxxxxxxxxxxxxxxxxxxxx
+  github = "jasonbrooks"
+  #gitlab = "xxxxxxxxxx"
+  twitter = "jasonbrooks"
