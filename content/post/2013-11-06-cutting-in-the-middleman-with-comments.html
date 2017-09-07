@@ -1,0 +1,42 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2013-11-06T20:49:20Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15836681783"
+  _wpcom_is_markdown: "1"
+  geo_address: San Francisco, CA, USA
+  geo_latitude: "37.7749295"
+  geo_longitude: "-122.41941550000001"
+  geo_public: "1"
+published: true
+status: publish
+tags: []
+title: Cutting in the Middleman, with Comments
+type: post
+url: /2013/11/06/cutting-in-the-middleman-with-comments/
+---
+
+<p>I blogged <a href="http://blog.jebpages.com/archives/asciidokken/">somewhat recently</a> about my interest in, and inaction around, static site blogging, where you write blog posts, use an app to turn them into plain HTML, and then drop them somewhere on the web, with no shadow of potentially/eventually vulnerable PHP and MySQL cranking away to deliver dynamically what needn't be dynamic.</p>
+<p>I hadn't yet pulled the trigger on ditching WordPress yet, preferring instead to satisfy my desire for writing posts in plain AsciiDoc-formatted text by copying and pasting rendered AsciiDoc into WordPress, or using this <a href="http://srackham.wordpress.com/blogpost-readme/">AsciiDoc-to-WordPress script</a> to pump in posts through the WordPress API.</p>
+<p>Mainly, what I was missing was for one of my <a href="https://twitter.com/tigert">bad ass</a> <a href="https://twitter.com/garrett">colleagues</a> to take the crazy box of lego pieces that get dumped out in front of your feet when you ask Google about static site blogging, make some smart choices, and build something that I could come along and tinker with. I mentioned before that I messed around with Awestruct and found it way too raw for me. After their own more able-minded examination, my colleagues agreed, and came forward with <a href="http://middlemanapp.com/blogging/">Middleman</a>.</p>
+<h3>Middleman It Is, But...</h3>
+<p>After poking a bit through Middleman, I felt comfy enough to adapt it for my own, extremely simple blog. I got a basic layout in place, and set about converting my WordPress posts into something workable for Middleman. My plan was to use AsciiDoc for my new writing, but most conversion scripts target the more popular Markdown. I found a script -- I'll look for the link -- that did an OK job converting, but I had to delete some of the "front matter" bits that I didn't need, and a few of my URLs rendered wrong. I've tried a few different tools for WordPress-to-SomethingStatic conversion, and they've all needed some hand-tweaking. So, low-frequency blogging FTW! I didn't have too many posts to hand-tweak.</p>
+<p>Now on to a REAL problem -- comments. One arguably important dynamic chore tackled by WordPress is accepting and managing blog comments. Most static blogs either do away with comments all together (easy to steel yourself for this decision after reading comments at Youtube or your local newspaper's web site for five minutes) or, sites go with the hosted Disqus comments service.</p>
+<p>I've bounced between Disqus and WordPress comments in the past, and have been happy with Disqus. They take the load off your site, and allow your page (with the help of something like wp super cache) to be mostly static, since all the dynamism happens, in javascript, in your reader's browser. Also, I like the way that Disqus knits siloed discussions from all over the web into something a bit more unified. You have posts and comment threads spread everywhere, and Disqus sort of pulls them together, and, through easy options for tweeting out a link to your comment, offers a way to pull in others.</p>
+<p>Switching from WordPress comments to Disqus comments means switching from a possibly self-hosted system to a definitely not self-hosted system, and that's a concern for many, particularly given the greater chances for privacy chicanery at sites out of your control. However, Disqus does a really good job importing from and exporting to WordPress, so even though I've swapped back and forth a few times, I've never had trouble getting my mitts back on my data, and that's my number one concern with using a hosted service.</p>
+<p>BUT, there's still another important issue. WordPress is open source software, and Disqus is not. I'm big on open source software -- I'm not opposed to using anything proprietary, not sure how I'd use my oven with a no-proprietary-ever stance, but I'm keen to see open source spread, so swapping something that's already open to something that is not is a concern.</p>
+<h3>Enter Juvia, and OpenShift (natch)</h3>
+<p>As usual, I approached the oracle of Google and, in fairly short order, was directed to Juvia, "a commenting server similar to Disqus and IntenseDebate." It sounded perfect, and not completely abandoned, although the demo site wasn't working, and its discussion forum (served from the terrible terrible why-does-anyone-use-this Google Groups) appears to have been wiped from the earth. Why not more activity around what appears to be a much-needed project?</p>
+<p>It may be because Juvia is a Ruby on Rails app, and while mysql/php hosting is handed down from the sky at little or no cost, ruby hosting is not. I saw one discussion of Juvia v. Disqus in my travels that boiled down to: "You could use Juvia, but hosting costs, so, use Disqus, which is free."</p>
+<p>But, that gentleman mustn't have been aware of OpenShift, where you can host all sorts of different apps in the service's free tier. I turned again to Google and found a few Juvia on OpenShift quickstarts. I used <a href="https://github.com/vonavi/juvia-openshift">this one</a>, although <a href="https://github.com/openshift-quickstart/juvia-example">this one</a> seems more official, though a bit less up-to-date.</p>
+<p>I spun up Juvia in one of my OpenShift gears, spun up another just to host my static blog files, and poked at my layout HAML until I got them working together. I used Juvia's WordPress comments importer to import my WordPress comments (which took some work), and here I am.</p>
+<p>Now, I am going to write all this up into a how to, but I need to do a bit more polishing -- you don't want to follow the steps I followed, you want to follow the steps I would have followed, had future me paid me a visit first.</p>
+<p>Till then, though, this is my first new, non-stub post in the new blog. With open source, self-hosted comments.</p>

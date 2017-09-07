@@ -1,0 +1,53 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2016-09-20T14:03:34Z
+meta:
+  _edit_last: "13396443"
+  _publicize_done_12821151: "1"
+  _publicize_done_12822612: "1"
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:12817127;s:57:"https://twitter.com/jasonbrooks/status/778338872094666752";}}
+  _publicize_job_id: "27033961409"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpas_done_12817127: "1"
+  _wpas_done_12818529: "1"
+  _wpcom_is_markdown: "1"
+  publicize_google_plus_url: https://plus.google.com/+JasonBrooks0/posts/iBKPtNPm5sR
+  publicize_twitter_user: jasonbrooks
+published: true
+status: publish
+tags: []
+title: upstream hyperkube, rpm edition
+type: post
+url: /2016/09/20/upstream-hyperkube-rpm-edition/
+---
+
+<p>I've <a href="http://www.projectatomic.io/blog/2016/09/running-kubernetes-in-containers-on-atomic/">written recently</a> about running kubernetes in containers on an atomic host. There are a few different ways to do it, but the simplest method involves fetching and running the Debian-based container provided by the upstream kubernetes project.</p>
+<p>Debian is awesome, but I'm team RPM -- when I run containerized apps, I tend to base them on CentOS or Fedora. If I can run kubernetes itself from an image based on one of those distros, I can save myself some storage and network transfer up front, and set myself up better to understand what's going on inside the kubernetes containers.</p>
+<p>As it turns out, it was pretty easy to <a href="https://github.com/kubernetes/kubernetes/compare/master...jasonbrooks:hyperkube-rpm">mod the Makefile and Dockerfile</a> that generate the containers. I swapped Debian apt-get specific bits for<br />
+yum ones, changed the default baseimage to <code>centos:centos7</code>, and removed the gcloud-specifc push command.</p>
+<p>The script expects to get a freshly-built copy of the all-in-one <code>hyperkube</code> binary that wraps together all of the kubernetes components from your local system. I modded the Makefile to grab a pre-built (by the kubernetes project) copy of this binary if it doesn't exist on your machine.</p>
+<p>Here's how to make your own CentOS or Fedora-based kubernetes container, which you can then run using the directions under the heading "Containers from Upstream" from <a href="http://www.projectatomic.io/blog/2016/09/running-kubernetes-in-containers-on-atomic/">this post</a>:</p>
+<p>[code lang=text]<br />
+$ git clone https://github.com/jasonbrooks/kubernetes.git </p>
+<p>$ git checkout hyperkube-rpm </p>
+<p>$ cd kubernetes/cluster/images/hyperkube </p>
+<p>$ make VERSION=v1.3.6<br />
+[/code]</p>
+<p>That command would build a CentOS-based hyperkube container, targeting the 1.3.7 release. To build and push to your docker registry, you could use the command:</p>
+<p>[code lang=text]<br />
+$ make push VERSION=v1.3.6 REGISTRY=&quot;YOUR-DOCKER-REGISTRY&quot;<br />
+[/code]</p>
+<p>To build and push a Fedora-based container with the very latest kube beta container, you can bump the <code>VERSION</code> and add a <code>BASEIMAGE</code> argument:</p>
+<p>[code lang=text]<br />
+$ make push VERSION=v1.4.0-beta.8 REGISTRY=&quot;YOUR-DOCKER-REGISTRY&quot; BASEIMAGE=fedora:24<br />
+[/code]</p>
+<p>I tested out <code>v1.3.7</code> and <code>v1.4.0-beta.8</code>on CentOS Atomic, but hit <a href="https://github.com/google/cadvisor/issues/1461">this<br />
+issue</a> with cAdvisor and cgroups. I clicked the version count back to <code>v1.3.6</code>, and that worked.</p>

@@ -1,0 +1,36 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-03-07T15:58:59Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856509849"
+  _wp_old_slug: "201"
+  original_post_id: "201"
+published: true
+status: publish
+tags:
+- ovirt
+title: 'oVirt or No Virt: Notebook Edition'
+type: post
+url: /2012/03/07/ovirt-or-no-virt-notebook-edition/
+---
+
+<p>oVirt is definitely not intended to be run on your notebook, and running something oriented toward powering whole data centers on a single, portable machine seems like overkill, anyway. For a Linux-powered notebook machine like mine, <a href="http://virt-manager.org/">virt-manager</a> is a great tool for spinning up all manner of VMs, and--while I've yet to get it running properly -- <a href="https://live.gnome.org/Boxes">GNOME Boxes</a> offers another promising option for taking advantage of the KVM hypervisor that's built into the Linux kernel.<img class="alignright size-full wp-image-208" title="ovirt-notebook" src="{{ site.baseurl }}/assets/ovirt-notebook.png" alt="" width="250" height="235" /></p>
+<p>However, since immersing myself in oVirt is <a title="working for The (shadow) Man" href="http://blog.jebpages.com/archives/working-for-the-shadow-man/">part of my job now</a>, and since I work with a lot of VMs on my work notebook, I wanted to see if I could come up with a notebook-friendly oVirt setup. The trouble with the single-machine rig that I described in my <a title="How to Get Up and Running with oVirt" href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/">recent oVirt hotwo</a> is that setting up the bridged networking that oVirt requires means disabling <a href="http://projects.gnome.org/NetworkManager/">NetworkManager</a>, the handy service that makes it easy to connect to VPNs and switch between WiFi connections. I wanted to avoid disabling NetworkManager.</p>
+<p>I spent a bit of time fiddling with nested KVM -- running an oVirt rig from within a VM on my machine. I was able to get this guest-within-a-guest setup working, but it was slow and unstable. Again, more sacrifice than I was willing to countenance for this.</p>
+<p>In the end, I got my notebook-based, NetworkManager-friendly oVirt setup working by adapting the default guest networking configuration for virt-manager, in which <a href="http://wiki.libvirt.org/page/FAQ#Networking">libvirt provides</a> a virtual network that acts like a NAT router for guest machines.</p>
+<p>This was a little tricky, because when you configure a machine to be used as an oVirt virtualization host, libvirt gets commandeered by a higher-level component, <a href="http://www.ovirt.org/wp-content/uploads/2011/11/ovirt-vdsm.pdf">vdsm</a> (pdf), such that the default virtual bridge configuration is deactivated and you're blocked from accessing libvirt directly.</p>
+<p>In order to restore the virtual bridge setup, you have to provide libvirt with the user name vdsm@rhevh and the password you'll find at /etc/pki/vdsm/keys/libvirt_password. I used the command line tool virsh to redefine the active "vdsm-ovirtmgmt" network to match my previous "default" network, and serve as a NAT router for the guest VMs on my notebook.</p>
+<p style="text-align:center;"><img class="aligncenter size-full wp-image-205" title="virsh" src="{{ site.baseurl }}/assets/virsh.png" alt="" width="400" height="268" /></p>
+<p>After making these changes, I rolled back the bridge-building changes to my ifcfg-em1 file, and deleted the ifcfg-ovirtmgmt file I'd created in step 12 of the howto. I also added the option "net.ipv4.ip_forward = 1" to /etc/sysctl.conf -- without this tweak, my VMs were able to access the network as expected, but I wasn't able to ssh into our otherwise reach my guests from my host machine.</p>
+<p>I've had oVirt set up this way on my notebook for about a week now. So far, it's been working really well. Before I shut off or suspend my notebook, I use the oVirt web admin in Firefox to put my host into maintenance mode. I also use the web admin to access the consoles of my guest machines through SPICE.</p>
+<p>I'm using an Iomega ix2-200 desktop NAS box for NFS and iSCSI storage. Rich tools for setting up shared storage is one of the nice things about using oVirt instead of a desktop-oriented virtualization tool.</p>
+<p>If the whole thing explodes, or just begins to droop into general suckage, I'll update this post to reflect that. :)</p>
+<p>&nbsp;</p>

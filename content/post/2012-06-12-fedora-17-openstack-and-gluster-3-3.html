@@ -1,0 +1,131 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-06-12T11:00:27Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856510473"
+  _wp_old_slug: "292"
+  original_post_id: "292"
+published: true
+status: publish
+tags:
+- fedora
+- gluster
+- openstack
+- swift
+title: 'Fedora 17, OpenStack Essex & Gluster 3.3: All Smushed Together'
+type: post
+url: /2012/06/12/fedora-17-openstack-and-gluster-3-3/
+---
+
+<p>Within the past couple weeks, <a href="http://fedoraproject.org/wiki/F17_release_announcement" target="_blank">Fedora</a> and <a href="http://www.gluster.org/2012/05/introducing-glusterfs-3-3/" target="_blank">Gluster</a> rolled out new versions, packed with too many features to discuss in a single blog post. However, a couple of the stand-out updates in each release overlap neatly enough to tackle them together--namely, the inclusion of <a href="http://fedoraproject.org/wiki/Features/OpenStack_Essex" target="_blank">OpenStack Essex in Fedora 17</a> and support for using <a href="http://www.gluster.org/community/documentation/index.php/OSConnect" target="_blank">Gluster 3.3 as a storage backend for OpenStack</a>.</p>
+<p>I've <a href="http://www.eweek.com/c/a/Cloud-Computing/StackOps-Distribution-Offers-an-Introduction-to-OpenStack-Cloud-679865/">tested OpenStack</a> a couple of times in the past, and I'm happy to report that while the project remains a fairly complicated assemblage of components, the community around OpenStack has a done a good job documenting the process of setting up a basic test rig. Going head to head with Amazon Web Services, even with the confines of one's own organization, won't be a walk in the park, but it's fairly easy to get OpenStack up an running in a form suitable for further learning and experimentation.</p>
+<h2>OpenStack on Fedora 17</h2>
+<p>The <a href="https://fedoraproject.org/wiki/Getting_started_with_OpenStack_on_Fedora_17">getting started with OpenStack on Fedora 17</a> howto that I followed for my latest test involves quite a bit of command line cut and paste, but it didn't take long for me to go from a minimal install Fedora 17 virtual machine to a single node OpenStack installation, complete with compute, image hosting, authentication, and dashboard services--everything I needed to launch VMs, register images, and manage everything from the comfort of a web UI.</p>
+<p><img class="aligncenter size-full wp-image-305" title="fedora-openstack" src="{{ site.baseurl }}/assets/fedora-openstack.png" alt="" width="500" height="354" /></p>
+<p>A couple of notes, I did everything on this minimal-install Fedora machine as root--since this is a soon-to-be blown-away test VM, I didn't bother to create additional users. You may need to sprinkle in some sudos if you're running as non-root. Also, I hit at least one issue with SELinux (related to glance) during my tests. I never turn off SELinux by default, but once I hit an error on a test box, I throw it into permissive mode.</p>
+<p>Also, I elected to run the whole show (the openstack part of it, at least) within a single virtual machine running on my home oVirt installation, so the performance of my guest instances was very slow, but everything worked well enough for me to take OpenStack for a spin, and get to fiddling with trickier OpenStack topics, such as...</p>
+<p>The one OpenStack element that the Fedora howto touches on only briefly is OpenStack Swift, the object storage system intended to replace Amazon's S3. Here's what the howto has to say about Swift:</p>
+<blockquote><p>These are the minimal steps required to setup a swift installation with keystone authentication, this wouldn't be considered a working swift system but at the very least will provide you with a working swift API to test clients against, most notably it doesn't include replication, multiple zones and load balancing.</p>
+<p>&nbsp;</p>
+<p>(<a href="https://fedoraproject.org/wiki/Getting_started_with_OpenStack_on_Fedora_17#Configure_swift_with_keystone">Configure swift with keystone</a>)</p></blockquote>
+<p>What an ideal segue for Gluster 3.3, a storage software project with replication and load balancing as its stock in trade. The Gluster portion of my tests was quite a bit trickier than the OpenStack on Fedora part had been, but I learned a lot about Gluster and OpenStack along the way.</p>
+<h2>Building Gluster 3.3 Packages</h2>
+<p>First off, Gluster 3.3 shipped a bit after Fedora 17, and the version of Gluster available in the Fedora software repositories is still at 3.2. What's more, the 3.3 packages offered by the Gluster project target Fedora 16, as well. The Fedora folder on the Gluster download server doesn't include any source rpms, but I found a spec file for building Fedora rpms in the Gluster source tarball on the <a href="http://download.gluster.org/pub/gluster/glusterfs/LATEST/">download server</a>.</p>
+<p>On my Fedora 17 notebook, I fetched the build dependencies for Gluster 3.2 using the command yum-builddep from the yum-utils package:</p>
+<pre>sudo yum-builddep glusterfs</pre>
+<p>I grabbed the file glusterfs.spec from the glusterfs-3.3.0.tar.gz tarball, dropped it in ~/rpmbuild/SPECS, and put the tarball into ~/rpmbuild/SOURCES. If you don't have rpm-build installed on your Fedora machine, you'll need to do that, as well.</p>
+<p>Next, I built my Gluster 3.3 packages for F17:</p>
+<pre>rpmbuild -bb ~/rpmbuild/SPECS/glusterfs.spec</pre>
+<p>Then, I copied the packages over to my OpenStack test machine and updated the glusterfs and glusterfs-fuse packages that had been pulled in as dependencies during my OpenStack on F17 install:</p>
+<pre>scp ~/rpmbuild/RPMS/x86_64/glusterfs-* root@openstackF17:/root</pre>
+<pre>ssh root@openstackF17 yum install -y ./glusterfs-3.3.0-1.fc17.x86_64.rpm glusterfs-fuse-3.3.0-1.fc17.x86_64.rpm</pre>
+<h2>Gluster+OpenStack: The Easy Way</h2>
+<p>As described on the <a title="OSConnect" href="http://www.gluster.org/community/documentation/index.php/OSConnect">Connecting with OpenStack Resource Page</a> on the Gluster wiki, there are two ways of using Gluster with OpenStack. The first is super simple, and amounts to locating the images for your running OpenStack instances on Gluster by simply mounting a Gluster volume at the spot where OpenStack expects to place these images. On the resource page, there's a PDF titled <a href="http://www.gluster.org/wp-content/uploads/2011/07/Gluster-Openstack-VM-storage-v1-shehjar.pdf" rel="nofollow">OpenStack VM Storage Guide</a> that steps through the process of creating a four node distributed-replicated volume and mounting it in the right spot. Easy.</p>
+<p><a href="http://blog.jebpages.com/wp-content/uploads/2012/06/smushed.png"><img class="aligncenter size-full wp-image-306" title="smushed" src="{{ site.baseurl }}/assets/smushed.png" alt="" width="500" height="362" /></a></p>
+<p>I did this with my test OpenStack setup, and it worked as advertised. I kicked off a yum update operation in one of my OpenStack instances, and then ungracefully shutdown (pulled the virtual plug on) the gluster VM node where the instance was calling home. I watched as the yum update process paused for a short time before continuing happily enough on one of the other Gluster nodes I'd configured.</p>
+<p>Where things got quite a bit trickier was with the second OpenStack-Gluster integration option, that for Unified Object and File Storage. Gluster's UFO is based on a slightly modified version of OpenStack Swift, where Gluster brings the storage, and users are able to access files and content either as objects, through Swift's REST interface, or as regular files, through Gluster's FUSE or NFS mounts.</p>
+<h2>Building Gluster UFO Packages</h2>
+<p>Again, I started by building some packages. The Gluster download site offers UFO (aka gluster-swift) packages for enterprise Linux 6 (RHEL and its relabeled children). There's a source tarball, but unlike the main glusterfs tarball, the gluster-swift tarball doesn't include a spec file for building rpms. I located spec files for gluster-swift and gluster-swift-plugin at <a href="https://github.com/gluster/glusterfs/tree/master/swift/1.4.8">Gluster's github site</a>, but these spec files referenced a handful of patches that weren't in the git repository, so I wasn't able to build them.</p>
+<p>After Googling a while for the missing patches, I found source rpms for gluster-swift and gluster-swift-plugin in a <a href="ftp://ftp.redhat.com/pub/redhat/linux/enterprise/6Server/en/RHS/2.0/SRPMS/">public source repository for Red Hat Storage 2.0</a>. Both of these packages are a hair older than the ones in the Gluster download location: gluster-swfit-1.4.8-3 vs 1.4.8-4 and gluster-swift-plugin-1.0-1 vs. 1.0-2, but I forged ahead with these.</p>
+<p>I had to tweak the SPEC files slightly, changing references to the python2.6 in el6 to the python2.7 that ships with Fedora 17, but I managed to build both of them without much hassle, before copying them over to my openstack test machine and installing them:</p>
+<pre>rpmbuild -bb ~/rpmbuild/SPECS/gluster-swift.spec</pre>
+<pre>rpmbuild -bb ~/rpmbuild/SPECS/gluster-swift-plugin.spec</pre>
+<pre>scp ~/rpmbuild/RPMS/noarch/gluster-swift* root@openstackF17:/root</pre>
+<pre>ssh root@openstackF17 yum install -y ./gluster-swift-*</pre>
+<h2>Gluster-Swift + OpenStack</h2>
+<p>Over on our openstackF17 machine, the gluster-swift package has placed a bunch of configuration files in /etc/swift. We're going to leave most of these configurations in place, but we need to make a few modifications, starting with fs.conf:</p>
+<pre>vi /etc/swift/fs.conf</pre>
+<p>I'm using the four VM gluster cluster described in the <a href="http://www.gluster.org/wp-content/uploads/2011/07/Gluster-Openstack-VM-storage-v1-shehjar.pdf" rel="nofollow">OpenStack VM Storage Guide</a> I mentioned above, which is remote from my openstack server, so I have to change "mount_ip" to the ip of one of my gluster servers, and change "remote_cluster" to yes. If my gluster volume, or part of it, was local, I could have left these values alone.</p>
+<p>The other thing required to make the remote gluster cluster bit work is enabling passwordless ssh login between my openstackF17 machine and the gluster server I pointed to in fs.conf:</p>
+<pre>ssh-keygen -t rsa</pre>
+<pre>ssh-copy-id -i ~/.ssh/id_rsa.pub root@gluster1</pre>
+<p>More config file editing. Next up, proxy-server.conf. In order to get gluster-swift working with OpenStack's Keystone authentication service, we're going to grab some of the configuration info from the Fedora 17 OpenStack guide:</p>
+<pre>vi /etc/swift/proxy-server.conf</pre>
+<p>Change the "pipeline" line under [pipeline:main], adding "authtoken keystone" to the line, and removing "tempauth":</p>
+<pre>pipeline = healthcheck cache authtoken keystone proxy-server</pre>
+<p>And then add these sections to correspond with our added elements. As to the "are these needed" comment question, that comes from the howto in the Fedora wiki, and I don't know the answer, so I left it in:</p>
+<pre>[filter:keystone]
+paste.filter_factory = keystone.middleware.swift_auth:filter_factory
+operator_roles = admin, swiftoperator
+[filter:authtoken]
+paste.filter_factory = keystone.middleware.auth_token:filter_factory
+auth_port = 35357
+auth_host = 127.0.0.1
+auth_protocol = http
+admin_token = ADMINTOKEN
+# ??? Are these needed?
+service_port = 5000
+service_host = 127.0.0.1
+service_protocol = http
+auth_token = ADMINTOKEN</pre>
+<p>If you followed along with the Fedora 17 OpenStack howto, you'll have a file (keystonerc) in your home directory that sets your OpenStack environment variables. Let's make sure our variables are set correctly:</p>
+<pre>. ~/keystonerc</pre>
+<p>Next, we run these commands to replace some placeholder values in our proxy-server.conf file:</p>
+<pre>openstack-config --set /etc/swift/proxy-server.conf filter:authtoken admin_token $ADMIN_TOKEN</pre>
+<pre>openstack-config --set /etc/swift/proxy-server.conf filter:authtoken auth_token $ADMIN_TOKEN</pre>
+<p>Now we add the Swift service and endpoint to Keystone:</p>
+<pre>SERVICEID=$(keystone service-create --name=swift --type=object-store --description="Swift Service" | grep "id " | cut -d "|" -f 3)</pre>
+<pre>echo $SERVICEID # just making sure we got a SERVICEID</pre>
+<pre>keystone endpoint-create --service_id $SERVICEID --publicurl "http://127.0.0.1:8080/v1/AUTH_$(tenant_id)s" --adminurl "http://127.0.0.1:8080/v1/AUTH_$(tenant_id)s" --internalurl "http://127.0.0.1:8080/v1/AUTH_$(tenant_id)s"</pre>
+<p>Gluster-swift will be looking for Gluster volumes that correspond to Swift account names. We need to figure out what names we need, and create Gluster volumes with those names. We ask Keystone about our account names:</p>
+<pre>keystone tenant-list</pre>
+<p>In my setup, this turns up four accounts:</p>
+<pre>+----------------------------------+--------------------+---------+
+|                id                |        name        | enabled |
++----------------------------------+--------------------+---------+
+| 18571133bf9b4236be0ad45f2ccff135 | invisible_to_admin | True    |
+| 1918b675fa1f4b7f87c2bb3688f6f2f7 | admin              | True    |
+| 42c41f15e6a24fa5b105e89b60af18fb | demo               | True    |
+| decd4d68f50345eeb2eae090e2d32dcb | service            | True    |
++----------------------------------+--------------------+---------+</pre>
+<p>So far, I've needed volumes for the admin and demo accounts. You'll need to name your Gluster volumes after the value in the "id" column. Following the four node example in the <a href="http://www.gluster.org/wp-content/uploads/2011/07/Gluster-Openstack-VM-storage-v1-shehjar.pdf" rel="nofollow">OpenStack VM Storage Guide</a>, the command (which you must run from on of your gluster nodes) will look like this, substituting your own Gluster node IPs, and your volume name values from keystone tenant-list:</p>
+<pre>gluster volume create 42c41f15e6a24fa5b105e89b60af18fb replica 2 10.1.1.11:/vmstore 10.1.1.12:/vmstore 10.1.1.13:/vmstore 10.1.1.14:/vmstore</pre>
+<p>Run the command again so you have volumes that correspond to both the admin and demo tenant ids.</p>
+<p>Each Gluster volume needs its own mount point. You don't have to create your mount points manually on each server. And again, the Gluster volume doesn't have to live on a remote cluster. Any properly named Gluster volume on a server that gluster-swift knows about (from fs.conf, which we modded earlier) and can access passwordlessly (red spell check underline be damned) ought to work.</p>
+<p>All right, almost done. Start or restart memcached, and start gluster-swift:</p>
+<pre>service memcached restart</pre>
+<pre>swift-init main start</pre>
+<p>Now, we should be able to test gluster-swift:</p>
+<pre>swift list</pre>
+<p>If all is well, gluster-swift should try to mount the admin volume (the keystonerc file is telling swift to use the admin account), and satisfying hard drive activity gurgling sounds should ensue. If you run the command "mount" you should see that you have a Gluster volume mounted at the mount point "/mnt/gluster-object/AUTH_YOURADMINVOLNAME". Like so:</p>
+<pre>gluster1:1918b675fa1f4b7f87c2bb3688f6f2f7 on /mnt/gluster-object/AUTH_1918b675fa1f4b7f87c2bb3688f6f2f7 type fuse.glusterfs (rw,relatime,user_id=0,group_id=0,default_permissions,allow_other,max_read=131072)</pre>
+<p>You can test uploading to the volume from the command line:</p>
+<pre>swift upload container /path/to/file</pre>
+<p>You ought to be able to ssh in to one of your gluster nodes, navigate to the mount point that corresponds to your admin account volume, and see the file you just uploaded.</p>
+<p>For a more GUI-ful experience, we can check out our snazzy gluster-swift store from the OpenStack dashboard (you'll have installed this if you followed the OpenStack Fedora 17 howto). Make sure your firewall is down or you have port 80 open, and restart your web server for good measure:</p>
+<pre>service httpd restart</pre>
+<p>Visit the dashboard at http://YOUROPENSTACKSERVERIP/dashboard, and log in with admin and (assuming you retained the password default from the howto) verybadpass. In the left nav column, click the "Project" tab. The default project is "demo" (which is why we had to create a demo volume). In the left nav column, under "Object Store," click "Containers," and create, delete, upload to, download from, etc. at will. In the background, just as with the "swift list" command, gluster-swift should be reacting to the dashboard's requests by mounting your Gluster volume.</p>
+<p><a href="http://blog.jebpages.com/wp-content/uploads/2012/06/upload-to-gluster-swift.png"><img class="aligncenter size-full wp-image-307" title="upload-to-gluster-swift" src="{{ site.baseurl }}/assets/upload-to-gluster-swift.png" alt="" width="500" height="271" /></a></p>
+<p style="text-align:center;"><img class=" wp-image-308 aligncenter" title="gluster-swift" src="{{ site.baseurl }}/assets/gluster-swift.png" alt="UFO in Action" width="500" height="359" /></p>
+<h2>For Further Study: Glance on Gluster-Swift</h2>
+<p>By default, OpenStack's image-hosting service, Glance, stores its images in a local directory, but it's possible to use Swift as a back-end for that image storage, by the backend listed in /etc/glance/glance-api.conf from "file" to "swift" and by correctly hooking up the authentication details there. I've yet to get this working, though.</p>
+<p>In this <a href="http://www.hastexo.com/resources/docs/installing-openstack-essex-20121-ubuntu-1204-precise-pangolin/appendix-c-setting-op-4">OpenStack on Ubuntu howto</a>, the author notes that a glance package from a particular PPA is required to make this work, due to some issue in the latest (as of 5/28/12) glance package from the official repos. I took a peek at the patches included in this substitute package, and couldn't immediately tell what, if anything, might be missing from Fedora's glance package.</p>
+<p>If you're still with me, and you're interested in setting up all or part of this yourself, don't hesitate to ask me questions--I puzzled over this for a week or so, and if I can save you some time, that'll make my toiling more worthwhile to me. Fire away in the comments below, or hit me up on IRC. I'm jbrooks on freenode IRC, and #gluster is one of the channels where you can find me.</p>

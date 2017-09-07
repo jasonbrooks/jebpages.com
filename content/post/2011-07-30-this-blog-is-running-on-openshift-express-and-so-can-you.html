@@ -1,0 +1,49 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2011-07-30T10:58:09Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856509053"
+  _wp_old_slug: "87"
+  original_post_id: "87"
+published: true
+status: publish
+tags:
+- meta
+- openshift
+- wordpress
+title: This Blog is Running on OpenShift Express, And So Can You
+type: post
+url: /2011/07/30/this-blog-is-running-on-openshift-express-and-so-can-you/
+---
+
+<p><em>this post is way out of date, it's gotten much easier to <a title="Hello world!" href="http://blog.jebpages.com/archives/1">run wordpress on openshift express</a></em></p>
+<p>This morning I installed this WordPress blog on Red Hat’s free Platform as a Service offering, OpenShift Express. Here’s how I did it:<!--more--></p>
+<ol>
+<li>Sign up for an OpenShift Express account <a href="https://openshift.redhat.com/app/user/new/express">here</a>. If you already have an RHN account, you’ll be able to use those credentials.</li>
+<li>Install the OpenShift Express client tools. If you’re running a Red Hat or Fedora distro, you can follow the instructions <a href="https://www.redhat.com/openshift/sites/default/files/documents/RHOS_Express_Eval_Guide.pdf">here</a> to configure the yum repository you need. I used an Ubuntu client, and I installed the tools by following the instructions <a href="https://www.redhat.com/openshift/kb/kb-e1000/installing-openshift-express-client-tools-on-non-rpm-based-systems">here</a>. If you’re using Ubuntu or Debian, watch for a typo on the “apt-get install” command: the text says “libopenssl-rubuy” but it ought to be “libopenssl-ruby”. I could have made life easier for myself by adding the path to ruby gem binaries to my path, but I didn’t, so I had to append all rhc commands with my path, /var/lib/gems/1.8/bin/.</li>
+<li>Follow the instructions in the Express Eval Guide to create a subdomain. When it’s installed, your WordPress instance will live on the Internet at APPNAME-SUBDOMAIN.rhcloud.com.</li>
+<li>If there’s a HOWTO on installing WordPress on OpenShift Express, I haven’t found it, so I used the <a href="https://www.redhat.com/openshift/sites/default/files/documents/RHOS_Express_Getting_Started_w_MediaWiki.pdf">Mediawiki HOWTO</a> to get started. As spelled out, more or less, in the guide, your next step is creating your app: rhc-create-app –a APPNAME –t php-5.3 -l USERNAME (the guide says -t php-5.3.2, but I was prompted to leave off that trailing .2)</li>
+<li>In the Mediawiki HOWTO, sqlite is the database of choice, but Red Hat recently added MySQL as a database option. I referred to <a href="https://www.redhat.com/openshift/blogs/whats-new-in-express-mysql-multiple-apps-and-server-side-bundling">this blog post</a> to add a MySQL DB to my new app: rhc-ctl-app -a APPNAME -e add-mysql-5.1 -l USERNAME</li>
+<li>After issuing that database command, the service spit out a user name, password and IP address for my new database instance. Take note of that info, we’ll need it to configure WordPress.</li>
+<li>Next, I changed into the PHP directory within my app, cd APPNAME/php, grabbed the code for the latest version of WordPress, and extracted it into my php directory: wget http://wordpress.org/latest.tar.gz &amp;&amp; tar zxf latest.tar.gz. I moved everything from the wordpress directory up a level into the php directory, and then deleted the wordpress folder and the latest.tar.gz archive.</li>
+<li>At this point, I was unsure how to create the database for wordpress within the MySQL DB that I’d added to my app. As far as I can tell, there’s no way to access OpenShift Express MySQL instances interactively, and unlike Mediawiki, WordPress doesn’t have a “give us your root creds and we’ll make a DB for you” install option. After a bit of Googling, however, I found what seemed to be a decent enough solution <a href="http://www.w3schools.com/php/php_mysql_create.asp">here</a>. I wrote a little createdb.php script and saved it in my app’s php directory.</li>
+<li>Next, I ran git status in my app directory, and added the untracked wordpress files and my DB creation file to my git repo with git add. I commited the changes with git commit -a and then used git push to push them up into OpenShift Express.</li>
+<li>I ran my DB creation script by visiting APPNAME-SUBDOMAIN.rhcloud.com/createdb.php, and then visited APPNAME-SUBDOMAIN.rhcloud.com to kick off the typical WordPress install process. I used the DB user name, password and URL info that OpenShift Express had given me, and clicked through the install.</li>
+<li>At this point, I’d created a new wp-config.php file through the Web app, and this config file wasn’t yet present in my git repo, so I returned to the Mediawiki setup instructions and followed the steps to download a snapshot of my app from the Web, to pull out the wp-config.php file, and drop it into the php directory of my app. I added this file to git, removed the createdb.php file, which I no longer needed, committed these changes to git, and pushed them.</li>
+<li>Profit! I installed WordPress on OpenShift Express, and here we are. If anyone tries to follow these steps and hits a snag, please let me know, and I’ll fix the instructions.</li>
+</ol>
+<p>Next Steps:</p>
+<ol>
+<li><del>Pointing my own domain name at this site.</del> (Hmm, guess not.)</li>
+<li>Maybe creating another php script to give the site a more locked down db configuration–the default admin user that the service gave me might well have more permissions than it ought to.</li>
+<li>Bring in some fancy plugins, perhaps, maybe tweak the theme. Does this header image seem unreasonably huge to anyone else, or is it just me?</li>
+<li>Look into app stats / performance features of OpenShift Express — are there any?</li>
+</ol>

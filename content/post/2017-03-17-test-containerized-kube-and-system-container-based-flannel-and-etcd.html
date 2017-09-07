@@ -1,0 +1,74 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2017-03-17T14:07:29Z
+meta:
+  _oembed_5dc903676b496aa39cd5e4c10da237d9: <div class="embed-twitter"><blockquote
+    class="twitter-tweet" data-width="500"><p lang="en" dir="ltr"><a href="https://twitter.com/jasonbrooks">@jasonbrooks</a>
+    You can upload pictures via the Add Media button in the editor itself, but adding
+    Media Management in the new UI is on our list</p>&mdash; WordPress.com (@wordpressdotcom)
+    <a href="https://twitter.com/wordpressdotcom/status/793701811874127873">November
+    2, 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js"
+    charset="utf-8"></script></div>
+  _oembed_346a472975e22ae6f971ec658a072ff3: <div class="embed-twitter"><blockquote
+    class="twitter-tweet" data-width="500"><p lang="en" dir="ltr"><a href="https://twitter.com/jasonbrooks">@jasonbrooks</a>
+    Markdown converting automatically to HTML was introduced in WordPress Core a few
+    versions ago, so works that way in .com and...</p>&mdash; WordPress.com (@wordpressdotcom)
+    <a href="https://twitter.com/wordpressdotcom/status/793701017930072064">November
+    2, 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js"
+    charset="utf-8"></script></div>
+  _oembed_time_5dc903676b496aa39cd5e4c10da237d9: "1490928213"
+  _oembed_time_346a472975e22ae6f971ec658a072ff3: "1490928213"
+  _publicize_job_id: "2982686945"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpas_skip_12817127: "1"
+  _wpas_skip_12818529: "1"
+  _wpcom_is_markdown: "1"
+published: true
+status: publish
+tags: []
+title: test containerized  kube and system container-based flannel and etcd
+type: post
+url: /2017/03/17/test-containerized-kube-and-system-container-based-flannel-and-etcd/
+---
+
+<p>[code lang=text]<br />
+$ git clone https://github.com/jasonbrooks/contrib.git<br />
+$ cd contrib<br />
+$ git checkout atomic-update<br />
+$ cd ansible<br />
+$ vi inventory/inventory</p>
+<p>[masters]<br />
+kube-master-test.example.com</p>
+<p>[etcd:children]<br />
+masters</p>
+<p>[nodes]<br />
+kube-minion-test-[1:2].example.com</p>
+<p>$ cd scripts<br />
+$ ./deploy-cluster.sh<br />
+[/code]</p>
+<p>This will fail (if you use hostnames) at: <code>TASK [flannel : Load the flannel config file into etcd]</code> because we need <a href="https://github.com/projectatomic/atomic-system-containers/pull/44">this PR</a> in the Fedora etcd system container. You can work around by sshing into your master, and editing the resolv.conf inside of your etcd system container to match the host, exiting, and re-running the script.</p>
+<p>[code lang=text]<br />
+$ ssh root@kube-master-test.example.com<br />
+# vi /var/lib/containers/atomic/etcd/rootfs/etc/resolv.conf<br />
+# exit<br />
+$ ./deploy-cluster.sh<br />
+[/code]</p>
+<p>That should work.</p>
+<p>This involves a <a href="https://github.com/kubernetes/contrib/compare/master...jasonbrooks:atomic-update">bunch of changes</a> to use docker containers for kube and use system containers for flannel and etcd. You can specify the registry, namespace and tag to use, as well as whether or not to containerize the master bits, the node bits, the etcd or the flannel using these extra options I've added to <code>inventory/group_vars/all.yml</code>:</p>
+<p>[code lang=text]<br />
+container_registry: candidate-registry.fedoraproject.org<br />
+container_namespace: f25<br />
+container_label: latest</p>
+<p>containerized_master: true<br />
+containerized_node: true</p>
+<p>etcd_spc: true<br />
+flannel_spc: true<br />
+[/code]</p>

@@ -1,0 +1,39 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-03-22T16:15:46Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856509944"
+  _wp_old_slug: "226"
+  original_post_id: "226"
+published: true
+status: publish
+tags:
+- community
+- dygraphs
+- mlstats
+- ovirt
+title: Community Metrics Wrangling with MLstats and OpenShift
+type: post
+url: /2012/03/22/community-metrics-wrangling-with-mlstats-and-openshift/
+---
+
+<p>As loyal readers of this blog (if any such creatures did exist) might have noticed, I've been <a href="http://blog.jebpages.com/archives/tag/ovirt/">working with the oVirt project</a>, which got a reboot last year when Red Hat finished open sourcing and porting to Java the previously .Net-based management for its enterprise virtualization product.</p>
+<p>Given the new start for oVirt, the project has been keen to get a handle on its community metrics, such as mailing list activity: is it growing, what's the mix of people coming from companies on the oVirt board compared to other organizations and individuals, and so on.</p>
+<p>While searching for suitable tools for mailing list analysis, I came across <a href="http://forge.morfeo-project.org/projects/libresoft-tools">mlstats</a>, a nifty application for slurping mailing list archives into a database, where they can be queried and made to cough up all sorts of interesting information. The application is really easy to use, and I had it up and running on my local machine, offering up pearls of oVirt mailing list wisdom, in no time at all.</p>
+<p>I wanted to set the app up on a remote server somewhere, complete with a cron job for running the daily stats update, and with some means of displaying certain information from the db, such as daily traffic on each of the oVirt lists. I opted to deploy this mlstats-o-matic on <a href="https://openshift.redhat.com/app/">OpenShift</a>, the Red Hat Platform as a Service, uh, service, on which I run this blog. OpenShift instances support mysql and cron, and the service's port forwarding feature is great for enabling database access via one's favored desktop query tools. More on that later.</p>
+<p>The cron job I set up on OpenShift referenced a text file at containing a list of the mailing list archive page URLs for oVirt, for mlstats to chug through and deposit into the database. A second cron job ran a list of sql queries, outputting the results in csv form, which I then charted on static web pages, using the javascript library <a href="http://dygraphs.com">dygraphs</a>. To make new charts, I could build additional queries and web pages, and reference them from cron jobs.</p>
+<p>That worked fairly well for our initial oVirt needs, but since the team I work on at Red Hat is focused on working with a broad range of open source projects, I wanted to figure out how to make it easy to use this same framework with other projects. The queries and the web pages were hard coded to the particular lists I'd chosen, so my initial take wasn't a very cleanly repeatable solution.</p>
+<p>More hackery ensued, and I changed the setup around to use bash scripts to assemble the queries and html pages based on whatever list of mailing lists a user might select. I'm sure I could have done it all much more elegantly, but it's all up at github where anyone is free to set me straight. :)</p>
+<p>I set the whole thing up as an <a href="https://github.com/jasonbrooks/mlstats-openshift-quickstart">OpenShift quickstart</a>, so if you're interested in engaging in some mailing list analysis action of your own, head over to Github and check it out. I made a short screencast of the process to give you an idea of how easy it is to get up and running:</p>
+<p>[youtube=https://www.youtube.com/watch?v=Et3mTzw0-3w]</p>
+<p>The cron job will go off and update the data each day, and there really isn't any maintenance to do. If you want to get at the data with your desktop mysql query tools, the command "rhc-port-forward -a <em>appname</em>" will make the database at OpenShift accessible to you locally.</p>
+<p>Please give it a shot, and let me know how it works for you!</p>
+<p>&nbsp;</p>

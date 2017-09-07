@@ -1,0 +1,39 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-11-29T10:40:38Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856512159"
+  _wp_old_slug: "458"
+  original_post_id: "458"
+published: true
+status: publish
+tags:
+- fedora
+- gluster
+- user story
+title: 'Gluster User Story: Fedora Hosted'
+type: post
+url: /2012/11/29/gluster-user-story-fedora-hosted/
+---
+
+<p>The <a href="https://fedoraproject.org/wiki/Fedora_Project_Wiki" target="_blank">Fedora Project's</a> <a href="http://fedoraproject.org/wiki/Infrastructure" target="_blank">infrastructure team</a> needed a way to ensure the reliability of its <a href="https://fedorahosted.org/web/about" target="_blank">Fedora Hosted</a> service, while making the most of their available hardware resources. The team tapped GlusterFS <a href="http://www.gluster.org/community/documentation/index.php/GlusterFS_Concepts#Replicate" target="_blank">replicated volumes</a> to convert what had been a two-node, active/passive, eventually consistent hosting configuration into a well-synchronized setup in which both nodes could take on user load.</p>
+<p><strong>Hosting Fedora Hosted</strong></p>
+<p>The Fedora Infrastructure team develops, deploys, and maintains various services for the Fedora Project. One of these services, Fedora Hosted, provides open source projects with a place to host their code and collaborate online.</p>
+<p><a href="https://fedorahosted.org/web/index"><img class="alignright size-full wp-image-463" title="fedora hosted" src="{{ site.baseurl }}/assets/Screenshot-from-2012-11-28-0940251.png" alt="" width="300" height="213" /></a></p>
+<p>I talked to the team's Infrastructure Lead, <a href="http://www.scrye.com/wordpress/nirik/" target="_blank">Kevin Fenzi</a>, about how they're using Gluster to ensure availability of these services while making the most of their server resources.</p>
+<p>Fedora Hosted is served from a pair of virtual instances hosted at <a href="http://www.serverbeach.com/" target="_blank">serverbeach.com</a>, which donates these resources to the project. The instances run Red Hat Enterprise Linux 6 and maintain a replicated GlusterFS 3.3.0 volume to keep the 50GB of project data stored at Fedora Hosted in sync. The nodes use Gluster's NFS mount support, which the team found to deliver better performance with the many small files that Fedora Hosted serves.</p>
+<p>"Both servers are in DNS, so it's round robin which one you hit for any given connection. Since the data on the backend is replicated, both of them are up to date at any given time," Kevin explained. "This way, not only can we handle more load cpu-wise, but if we wish to reboot one node for an update or the like, we simply adjust DNS and there is no outage seen by our projects."</p>
+<p><strong>The Road to Gluster</strong></p>
+<p>An earlier incarnation of Fedora Hosted was also run on a pair of virtual instances, one actively serving users and the other a standby kept in sync with an hourly rsync job. If the primary node failed, the standby instance could be brought up in short order, but the hourly sync window meant that the service could suffer an hour or two of data loss.</p>
+<p>The Fedora Infrastructure team managed to close this sync window by shifting to a new configuration based on the DRBD project. While this solution dealt with the problem of data loss following an outage, the configuration left one node mostly idle.</p>
+<p>The team's first foray into a GlusterFS-backed configuration for Fedora Hosted turned up a couple of issues with the then-current GlusterFS version 3.2, which the Gluster project addressed in their 3.3 release.</p>
+<p>"The Gluster folks were very responsive to our issues and were working on the patch very soon after we requested it," Kevin explained. "Additionally, 3.3 performance seemed to be much better than 3.2 for our use cases."</p>
+<p>Looking ahead, Kevin and the other members of the Infrastructure team have their eyes set on continued performance enhancements. While the Gluster 3.3-backed Fedora Hosted service has handled its community collaboration load quite well, Kevin pointed out that “we could always want better performance.”</p>

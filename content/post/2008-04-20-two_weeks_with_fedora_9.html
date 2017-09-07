@@ -1,0 +1,67 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2008-04-20T13:42:03Z
+excerpt: |
+  Recently, I came across a blog post about how to install a LiveCD version of Red Hat's upcoming Fedora 9 release onto a USB stick, leaving space on the stick for data to persist between reboots.
+
+  Impressed by the persistent USB LiveCD fun and partition encrypting installer improvements, I chose to throw caution to the wind and load up Fedora 9 Beta on my main notebook, replacing the beta Hardy Heron install I'd been running--quite stably--for several weeks.
+
+  Read on for the testing details, but the bottom line for Fedora 9 is more or less the same as with previous Fedora versions: Fedora can indeed be used for anything, its primary purpose is to serve as a leading-edge development platform for Red Hat's initiatives. As Red Hat confirmed very clearly last week, providing a mainstream desktop/notebook operating system is not one of their product goals.
+meta:
+  _publicize_job_id: "15853825747"
+  _wp_old_slug: "2033"
+  original_post_id: "2033"
+published: true
+status: publish
+tags:
+- FE
+title: Two Weeks with Fedora 9
+type: post
+url: /2008/04/20/two_weeks_with_fedora_9/
+---
+
+<p>Recently, I came across a <a href="http://katzj.livejournal.com/419158.html">blog post</a> about how to install a LiveCD version of Red Hat's upcoming Fedora 9 release onto a USB stick, leaving space on the stick for data to persist between reboots.</p>
+<p>
+Impressed by the persistent USB LiveCD fun and partition encrypting installer improvements, I chose to throw caution to the wind and load up Fedora 9 Beta on my main notebook, replacing the Hardy Heron Beta install I'd been running--quite stably--for several weeks.</p>
+<p>
+Read on for the testing details, but the bottom line for Fedora 9 is more or less the same as with previous Fedora versions: Fedora can indeed be used for anything. Its primary purpose is to serve as a leading-edge development platform for Red Hat's initiatives. As Red Hat <a href="http://www.press.redhat.com/2008/04/16/whats-going-on-with-red-hat-desktop-systems-an-update/">confirmed very clearly</a> last week, providing a mainstream desktop/notebook operating system is not one of their product goals.</p>
+<p>
+While I've very recently <a href="http://www.eweek.com/c/a/Linux-and-Open-Source/Red-Hats-Challenge/">called on Red Hat</a> (<a href="http://www.eweek.com/c/a/Infrastructure/Novell-Needs-to-Bridge-the-Gap/">and Novell</a>) to address mainstream Linux users more directly, I can certainly respect their decision to focus on their bread-and-butter products. What's more, even if they aren't productizing it, Red Hat's desktop and notebook work does continue, and is definitely evident in other, more end-user focused distributions--such as the Ubuntu release, which I returned after spending two weeks with Fedora 9.</p>
+<p>
+<strong>Spending Time with Fedora 9</strong></p>
+<p>
+As I mentioned above, it was Fedora 9's support of USB stick-based persistent LiveCD deployments that enticed me to download the in-development distro, and when I tried it out for myself, it worked great. Fedora 9 booted up from the 2GB USB stick I used, and, through the virtue of solid state, did so a lot more quickly than CD-based LiveCD images do. I used my portable Fedora 9 system to browse the Internet. I downloaded some things, and I installed a piece of software, too. I tried rebooting the system, and, sure enough, the changes I'd made did persist.</p>
+<p>
+Next, while perusing the Fedora 9 Beta release notes, I saw that Fedora 9 now offers a partition encryption option at install time. It's been possible to set up a Linux system with encrypted partitions for some time now, but only Debian and Ubuntu had implemented it as an install-time option.</p>
+<p>
+Installation on my trusty ThinkPad T60 was smooth, and the encryption part boiled down to checking off an option box. I booted up and keyed in my encryption passphrase. Everything seemed to work, including my wireless network.</p>
+<p>
+I hit the Web, and found that Flash and Java didn't work properly for me. For Flash, I hit <a href="https://bugzilla.redhat.com/show_bug.cgi?id=439858">the same bug</a>  that Linus did--YouTube videos wouldn't play. As for Java, the StatTracker applet for my Yahoo-hosted fantasy basketball league wouldn't load.</p>
+<p>
+I was prepared for these snags, however, since I know that Red Hat and Fedora are focused on pushing the all-free software envelope wherever possible. As a result, Firefox came pre-configured with the LGPL (Lesser General Public License) <a href="http://swfdec.freedesktop.org/wiki/">Swfdec-Mozilla plug-in</a>, in lieu of a pointer to Adobe's Flash download page.</p>
+<p>
+I downloaded Flash from Adobe, and I put off downloading Java from Sun. Sadly, at the time I was testing Fedora, I was already more or less out of contention in my fantasy basketball league.</p>
+<p>
+Next, I applied all the available updates (since Fedora 9 was still in development, there were many). I restarted, and found that my X server wouldn't start. Annoyingly, Red Hat's usually great fail-safe display mode didn't kick in, either. I had trouble with this <a href="http://www.eweek.com/c/a/Linux-and-Open-Source/Desktop-Linux-Trio-Offers-Look-at-Whats-To-Come/2/">when I tested Fedora 8</a>, and the fix required me to twiddle with a config file to force my way into fail-safe mode. After I got my X back, I installed the RadeonHD driver that my notebook requires, and I was back in business.</p>
+<p>
+I turned next to installing the KVM virtualization software and Red Hat's virt-manager virtualization management tool. I used the virt-manager tool to create a virtual machine, and I hit another familiar snag. As in <a href="http://www.eweek.com/c/a/Linux-and-Open-Source/Red-Hat-Enterprise-Linux-5-Some-Assembly-Required/1/">my tests last year of RHEL (Red Hat Enterprise Linux) 5</a>, I found that by policy, SELinux (Security Enhanced Linux) wouldn't allow the virtualization application to read files in my home directory, where I'd instructed the setup tool to create the hard drive image file for my VM.</p>
+<p>
+Like I wrote in that RHEL 5 review:</p>
+<blockquote><p>RHEL 5's SELinux policy expects images to live in /var/lib/xen/images, and images stored elsewhere--such as ours---require re-labeling to avoid SELinux errors.</p>
+<p>
+While this was a good opportunity to see RHEL 5's new SELinux Troubleshooter in action, it would have been helpful if RHEL's virtualization manager had given us a heads up about this earlier.</p>
+</blockquote>
+<p>
+I ended up tossing SELinux into permissive mode, which records and flags the activities it's been instructed to deny, but doesn't deny them. Even though SELinux can be a pain, I'm a believer in <a href="http://www.eweek.com/c/a/Infrastructure/Wield-the-Shield-How-Trustworthy-Is-Your-OS/">MAC (mandatory access control) enhancements for operating systems</a>, and I'm rooting for them to succeed.</p>
+<p>
+Feature wise, the combination of KVM and virt-manager is nowhere near as good as <a href="http://www.eweek.com/c/a/Desktops-and-Notebooks/VMware-Expands-Virtualization-Options/">VMware Workstation</a>, but it serves the same basic functions, and it's free. The Windows XP VM that I created under Fedora 9 performed well, and the fact that KVM is built into the system is a major plus. One of my pet VMware peeves is having to compile and recompile drivers, and the fact that KVM is part of the Linux kernel means never having to think about drivers.</p>
+<p>
+Fedora 9 may no longer power my primary notebook, but I'm not done with it. I'm looking forward to digging into the distribution's PolicyKit and PackageKit frameworks, and spending time with the much-needed FreeIPA project, which rides along with this release of Fedora. Stay tuned.</p>
+<p /></p></p></p></p></p></p></p></p>

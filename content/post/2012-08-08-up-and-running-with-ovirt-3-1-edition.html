@@ -1,0 +1,93 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-08-08T11:25:28Z
+meta:
+  _edit_last: "13396443"
+  _oembed_02a31f652d70b8e17d248c982b7eb6fb: '{{unknown}}'
+  _oembed_d99674d1def8b87530b111f3ff01344a: '{{unknown}}'
+  _oembed_e203befc99fb5f5b247e6923d406029e: '{{unknown}}'
+  _publicize_job_id: "15856510854"
+  _wp_old_slug: "372"
+  original_post_id: "372"
+published: true
+status: publish
+tags:
+- fedora
+- ovirt
+- vdsm
+- virtualization
+title: Up and Running with oVirt, 3.1 Edition
+type: post
+url: /2012/08/08/up-and-running-with-ovirt-3-1-edition/
+---
+
+<p><em><strong><a title="Up and Running with oVirt, 3.2 Edition" href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-2-edition/">Update: I've written an updated version of this guide for oVirt 3.2.</a></strong></em></p>
+<p>Last February or so, I wrote a post about <a title="How to Get Up and Running with oVirt" href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/">getting up and running with oVirt</a>, the open source virtualization management project, on a single test machine. Various things have changed since then, such as a shiny new <a href="http://www.ovirt.org/2012/08/08/ovirt-3-1-release/">oVirt 3.1 release</a>, so I'm going to update the process in this post.</p>
+<p><strong>What you need:</strong></p>
+<p>A test machine, ideally an x86_64 system with multiple cores, hardware virtualization extensions and plenty of RAM (like 4GB or more). The default OS for oVirt 3.1 is <a href="http://fedoraproject.org/get-fedora">Fedora 17</a>, and that's what I'll be writing about here. Your test machine must have a host name that resolves properly on your network, whether you're setting that up in a local dns server, or in the /etc/hosts file of any machine you expect to access your test machine from.</p>
+<p><strong>UPDATE:</strong> For my Fedora oVirt installs, I've been using a minimal install of Fedora, which is an option if you start from the<a href="http://fedoraproject.org/en/get-fedora-options#formats"> DVD or network install images</a>. I interact with my minimal installs via ssh. If you're using a minimal install with ssh, my instructions work just fine. However, if you start from the default Fedora LiveCD media, you'll need to take a couple of extra steps. You must disable NetworkManager: (sudo systemctl stop NetworkManager.service &amp;&amp; sudo systemctl disable NetworkManager.service), you must enable sshd: (sudo systemctl start sshd &amp;&amp; sudo systemctl enable sshd), and then reboot for good measure before proceeding with the rest of the steps.</p>
+<p><del> <em>(BUG NOTE: With the latest Fedora 17 kernel, I'm hitting <a href="https://bugzilla.redhat.com/show_bug.cgi?id=845660">https://bugzilla.redhat.com/show_bug.cgi?id=845660</a>, preventing nfs domains from attaching, so for now, you'll want to run a previous fedora kernel. (BUG NOTE NOTE: This bug, at long last, is just about squashed. Stay tuned.))</em></del></p>
+<p>&nbsp;</p>
+<p><em>The package vdsm-4.10.0-10 squashed the above bug dead. Make sure you're up to date w/ it to avoid issues w/ post 3.5 Fedora kernels.</em></p>
+<p><del><em>(A NEW BUG NOTE: There's a new, 3.2 version of ovirt-engine-sdk in the Fedora 17 update repo. The oVirt 3.1 packages that depend on the sdk don't call specifically for version 3.1, but they appear not to work with 3.2. For now, you must downgrade to the 3.1 version of the sdk in order for the all-in-one installer and other features to work properly: "yum downgrade ovirt-engine-sdk" I've filed a bug, here: <a href="https://bugzilla.redhat.com/show_bug.cgi?id=869457">https://bugzilla.redhat.com/show_bug.cgi?id=869457</a> -- you can cc yourself on the bug for progress updates.)</em></del></p>
+<p>&nbsp;</p>
+<p><strong>All-in-One Install:</strong></p>
+<p>oVirt 3.1 now includes an installer plugin for setting up the sort of single machine installation I wrote about previously. It's good for testing out oVirt, and if you want to expand from your single machine install to cover additional nodes and storage, you can do that. Read on for the steps involved, and/or watch this handy screencast I made of the process:</p>
+<p style="text-align:center;">[youtube:http://www.youtube.com/watch?v=Aq3ctFhBIhk]</p>
+<p>1. Install the ovirt-release package on your Fedora 17 machine: "yum install http://www.ovirt.org/releases/ovirt-release-fedora.noarch.rpm"</p>
+<p>2. Install the ovirt-engine all-in-one package: "yum install ovirt-engine-setup-plugin-allinone"</p>
+<p>2a. As pointed out by oVirt community member Adrián, in the comments below, you can ensure that the install script allows enough time for the host to add itself by editing "/usr/share/ovirt-engine/scripts/plugins/<a href="http://all_in_one_100.py/" rel="nofollow">all_in_one_100.py</a>" to make the "waitForHostUp timeout larger, like so:</p>
+<p><code>def waitForHostUp():<br />
+utils.retry(isHostUp, tries=40, timeout=300, sleep=5)</code></p>
+<p>3. Run engine-setup: "engine-setup" and answer all the questions.</p>
+<p>I've found that the all-in-one installer sometimes times out during the install process. If the script times out during the final "AIO: Adding Local host (This may take several minutes)" step, you can proceed to the web admin console to complete the process. If it times out at an earlier point, like waiting for the jboss-as server to start, you should run "engine-cleanup" and then re-run "engine-setup".</p>
+<p>4. When the engine-setup script completes, visit the web admin console at the URL for your engine machine. It will be running at port 80 (unless you've chosen a different setting in the setup script). Choose "Administrator Portal" and log in with the credentials you entered in the engine-setup script.</p>
+<p>From the admin portal, take a look at the "Storage" and "Hosts" tabs. If the all-in-one process completed, you should see a host named "local_host" with a status of "Up" under Hosts, and you should see a storage domain named "local_host-Local" under "Storage."</p>
+<p>If your local_host is still installing, you'll need to wait for it to finish before proceeding. You should be able to view its progress from the events panel at the bottom of the console interface. Once the host is finished installing, click on your "local_host" and hit the "Maintenance" link to put it into maintenance mode. Once your host is in maintenance mode, you'll be able to click on the "Configure Local Storage" link, where you enter the same local storage path you entered into the engine-setup script, and then hit "OK."</p>
+<p>5. Once the configure local storage process is complete (whether this was taken care of during engine-setup, or if you had to do it manually in step 4) click on the storage tab and highlight the iso domain you created during the setup-script. In the pane that appears below, choose the "Data Center" tab, click "Attach," check the box next to your local data center, and hit "OK." Once the iso domain is finished attaching, click "Activate" to, uh, activate it.</p>
+<p>6. Now you have an oVirt management server that's configured to double as a virtualization host. You have a local data domain (for storing your VM's virtual disk images) and an NFS iso domain (for storing iso images from which to install OSes on your VMs).</p>
+<p>To get iso images into your iso domain, you can copy an image onto your ovirt-engine machine, and from the command line, run, "engine-iso-uploader upload -i iso NAME_OF_YOUR_ISO.iso" to load the image. Otherwise (and this is how I do it), you can mount the iso NFS share from wherever you like. Your images don't go in the root of the NFS share, but in a nested set of folders that oVirt creates automatically that looks like: "/nfsmountpoint/BIG_OLE_UUID/images/11111111-1111-1111-1111-111111111111/NAME_OF_YOUR_ISO.iso. You can just drop them in there, and after a few seconds, they should register in your iso domain.</p>
+<p>Once you're up and running, you can begin installing VMs. For your viewing pleasure, here's another screencast, about creating VMs on oVirt:</p>
+<p style="text-align:center;">[youtube:http://www.youtube.com/watch?v=C4gayV6dYK4]</p>
+<p><strong>Beyond All in One (or skipping it all together):</strong></p>
+<p>Installing: A "regular" multi-machine install of oVirt works in pretty much the same way, except that in step two, you simply install "yum install ovirt-engine" and during the "engine-setup" process, you won't be asked about installing VDSM or a local data domain on your engine. I typically skip creating an iso domain on my engine, as I use a separate NAS device for my iso domain needs.</p>
+<p>The local data center, cluster and storage domain created as part of the all-in-one installation option are only accessible to the virtualization host installed locally on the engine. Shifting to a multi-machine setup involves moving that local host to the Default datacenter and cluster, which starts with putting the host into maintenance mode, clicking edit, and switching the Data Center and Cluster values to "Default" (or to another, non-local set of data center and cluster values).</p>
+<p>Hosts: Once the setup script is finished, you can head over to the web admin console to add hosts and storage domains. oVirt hosts can be either regular Fedora 17 boxes or machines installed with oVirt Node. In either case, you add one of these machines as an oVirt host by clicking "New" under the "Hosts" tab in the web admin console, and providing a name, IP address (or host name) and root password for your host-to-be, and clicking OK. A dialog will complain about configuring power management, but it's not strictly required.</p>
+<p>When adding an oVirt Node-based system as a host, you can also provide the ovirt-engine address and admin password in the admin interface of the node, which will add the node to your ovirt-engine server, pending approval through the web admin console.</p>
+<p>Storage: A multi-machine setup requires a shared storage domain, such as one backed by NFS or iSCSI. Setting up an NFS storage domain involves clicking "New Domain" on the "Storage" tab, giving the new data domain a name and configuring its export path. Setting up an iSCSI domain is similar, but involves entering the IP address of your iSCSI target, discovering available LUNs, and selecting one to use.</p>
+<p><strong>When Things Go Wrong:</strong></p>
+<p>A few things to do/check when things go wrong.</p>
+<p>1. Put selinux into permissive mode: "setenforce 0" I run my systems with selinux enabled, but there are sometimes selinux-related bugs. Putting your test system into permissive mode will get you past the errors.</p>
+<p>2. Check the logs:</p>
+<ul>
+<li>ovirt-engine install log lives at /var/log/ovirt-engine/engine-setup*.log</li>
+<li>jboss app server logs live at /var/log/ovirt-engine/boot.log and /var/log/ovirt-engine/server.log</li>
+<li>ovirt-engine logs live at /var/log/ovirt-engine/engine.log -- you can tail -f /var/log/ovirt-engine/engine.log to watch what the engine is doing</li>
+<li>vdsm logs live (on each virt host) at /var/log/vdsm/vdsm.log -- you can watch these to see what's going on with individual virt hosts</li>
+</ul>
+<p>3. Visit us at #ovirt on OFTC. My handle there is jbrooks. If you don't get an answer there, send a message to users@ovirt.org.</p>
+<p><strong>Faking It:</strong></p>
+<p>I mentioned right at the top that if you want to test oVirt virtualization, you need a machine with hardware virtualization extensions. The oVirt management engine can live happily within a VM, but for hosting VMs, you need those extensions.</p>
+<p>While most physical machines these days come with those extensions, virtual machines don't have them. There's such a thing as nested KVM virtualization, but it's tricky to set up and pretty unstable when you can set it up.</p>
+<p>There is a way to test out oVirt without hardware virtualization extensions, but the catch is that you can't actually run any VMs on one of these "fake" installs. Why bother? Well, there's a lot to test and see in oVirt that falls short of running VMs--I made my whole installing oVirt hotwo video on a VM running inside of my real oVirt rig, for instance. You can get a feel for installing hosts and configuring storage, and managing Gluster volumes <del>(a topic I haven't covered here, but will, soon, in another post, till then <a href="http://middleswarth.net/content/installing-ovirt-31-and-glusterfs-using-either-nfs-or-posix-native-file-system-engine">see here for more info on oVirt/Gluster</a>)</del>. For more on oVirt w/ Gluster, <a title="oVirt 3.1, Glusterized" href="http://blog.jebpages.com/archives/ovirt-3-1-glusterized/">see here</a>.</p>
+<p>For the all-in-one setup instructions above, right after step 2:</p>
+<ul>
+<li>install the "fake qemu" package (yum install vdsm-hook-faqemu)</li>
+<li>edit /etc/vdsm/vdsm.conf, changing line # fake_kvm_support = false to fake_kvm_support = true</li>
+<li>replace the contents of the of /usr/share/vdsm-bootstrap/vds_bootstrap.py (it'll be there post step 2) with the file at http://gerrit.ovirt.org/cat/5611%2C3%2Cvds_bootstrap/vds_bootstrap.py%5E0</li>
+<li>continue to step 3</li>
+</ul>
+<p>That vds_bootstrap.py step shouldn't be required, and I'm going to file a bug about it as soon as I finish this post. For more information on this topic, see: http://wiki.ovirt.org/wiki/Vdsm_Developers#Fake_KVM_Support.</p>
+<p>If you're trying to configure a separate fake host, for now, you'll need to do it on a regular vdsm (not oVirt Node) host, though this should soon change. But, for your regular host, before trying to add the host through the oVirt web admin console:</p>
+<ul>
+<li>run "yum install vdsm-hook-faqemu vdsm"</li>
+<li>edit /etc/vdsm/vdsm.conf, changing line # fake_kvm_support = false to fake_kvm_support = true</li>
+</ul>
+<p>Either way, you'll need that modded /usr/share/vdsm-bootstrap/vds_bootstrap.py file on your engine, and you only have to change this file once, until/unless a future package update restores the faqemu-ignorant file.</p>

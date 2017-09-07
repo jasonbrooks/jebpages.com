@@ -1,0 +1,34 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-07-30T13:26:48Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856510665"
+  _wp_old_slug: "346"
+  original_post_id: "346"
+published: true
+status: publish
+tags:
+- cinnamon
+- fedora
+title: Upgrading the Family PC to Fedora 17, and Cinnamon
+type: post
+url: /2012/07/30/upgrading-the-family-pc-to-fedora-17-and-cinnamon/
+---
+
+<p>This weekend I upgraded our family PC to Fedora 17. I've been running this latest release for a while on my regular work machine and on my various (and generally short-lived) test systems, but I tend to be slower on the distro upgrade draw with the family computer. For me, slow usually means upgrade within two weeks of release, but this time around, it took me almost two months to undertake the upgrade.</p>
+<p><img class="aligncenter size-full wp-image-351" title="cinnamon" src="{{ site.baseurl }}/assets/cinnamon.png" alt="" width="450" height="333" /></p>
+<p>I did try upgrading from Fedora 16 to Fedora 17 about a month ago, using Fedora's <a href="https://fedoraproject.org/wiki/How_to_use_PreUpgrade">preupgrade feature</a>, but the preupgrade process failed for me right at the end--following the lengthy process of downloading every package needed for the upgrade--with a complaint (if I recall correctly) about grub2-tools being missing. I checked to confirm that the grub2-tools package was indeed installed before shelving the upgrade effort for a while. Even though I'm always hot to upgrade to the latest and greatest, my wife maintains a "don't be changing my computer all around" attitude.</p>
+<p>I resolved to retry the upgrade after <a href="http://www.phoronix.com/scan.php?page=news_item&amp;px=MTE0Mzk">reading about</a> how the <a href="http://cinnamon.linuxmint.com/">Cinnamon desktop environment</a> of Linux Mint fame had made its way into the official Fedora repositories. See, my wife's "don't change stuff" prime directive had clashed pretty directly with the GNOME 3 "hey, let's change everything" design philosophy, and the Cinnamon desktop environment was supposed to be a better fit for users still pining for the familiarity of GNOME 2.</p>
+<p>I started out as one of those piners, but after a few months using GNOME Shell, I got used to it, but I still install the GNOME Tweak Tool right off the bat in order to roll back some of the more annoying user interface defaults in GNOME Shell. Really, I don't understand why it wasn't possible for the GNOME 3 designers to make the shift from the v2 to the v3 user interface a bit more welcoming for its existing user base. What's so bad about keeping a panel around, or allowing files and folders to show up on the desktop, or having minimize and maximize buttons in your window decorations?</p>
+<p>I'm sort of going off track from the upgrade tale here, but to me, the Cinnamon desktop environment points pretty clearly to a direction that the GNOME designers could have taken--the fancy OS X-style expose modes are still around in Cinnamon, but so are the familiar panels with app menus and window lists. Also, Cinnamon includes plenty of options for configuring basic settings, like fonts. I still can't believe that you have to download a separate tool (the aforementioned gnome-tweak-tool) to change the fonts you use in GNOME 3.</p>
+<p>On Fedora 16, my wife's login was set use a Compiz-based GNOME 2-workalike session by default, and my login was set to use the default GNOME Shell option. Unfortunately, something about this combination broke fast user switching, so my login didn't end up getting much use. Post-upgrade, my wife's Cinnamon session and my GNOME Shell session get along much better--we're able to swap between our login sessions as expected.</p>
+<p>For the upgrade itself, I opted to upgrade from a copy of the F17 DVD that I'd written onto a USB key. The upgrade ran through without issue, putting in place some 1200+ new packages. What was weird, though, was that once I booted into my newly-upgraded system, I found tons of F16 packages still in place. I ran a "yum distribution-synchronization" to get up to date, and again, some 1200+ packages required updating. I'm not sure what happened there, but between that and my experience with preupgrade, I'm reminding myself to chip in some QA love on upgrade matters as the F17-to-F18 switchover approaches.</p>
+<p>My wife's spent a few hours now on her newly Cinnamonized desktop, and her experiences have been delightfully uneventful. Low-impact system administration FTW!</p>

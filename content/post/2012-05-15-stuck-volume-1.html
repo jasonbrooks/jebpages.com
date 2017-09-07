@@ -1,0 +1,33 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-05-15T17:19:22Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856510326"
+  _wp_old_slug: "270"
+  original_post_id: "270"
+published: true
+status: publish
+tags:
+- openshift origin
+title: stuck, volume 1
+type: post
+url: /2012/05/15/stuck-volume-1/
+---
+
+<p>So, I'm <a title="Building My Own PaaS with OpenShift Origin" href="http://blog.jebpages.com/archives/building-my-own-paas-with-openshift-origin/">working my way</a> through the OpenShift Origin <a href="https://openshift.redhat.com/community/wiki/build-your-own">BYO PaaS wiki page</a>, but I'm stuck right now near the finish line.</p>
+<p>On Saturday, I was cranking through the howto, highlighting and middle-click pasting my way to BYOP nirvana, until I hit an authentication issue when it was time to create a domain on my newly-minted PaaS.</p>
+<p>After taking a break for a couple days, I realized that I'd simply forgotten to point my rhc client at the right host -- rhc defaults to openshift.redhat.com, and if there's an account on the Red Hat hosted server with the user name "admin" I can confirm that that user's password is not "admin" as well.</p>
+<p>Cinch. I'd be up and running in no time. Except I hit another issue -- my host complained about: "Permission denied - /var/www/stickshift/broker/Gemfile.lock" and there was no such file on my host. With I bit of help from #openshift-dev, I got past the error by running "bundle install" in the broker directory and then chown-ing Gemfile.lock apache:apache.</p>
+<p>But I hit another error message: "Failed to authenticate user 'stickshift' on db 'stickshift_broker_dev'." Word in #openshift-dev is that this is a mongo issue that someone else following the BYO instructions recently encountered as well.</p>
+<p>I'll circle back to this, but for now I'm going to proceed using the OpenShift Origin image <a title="Run OpenShift Origin from LiveCD, and Make it Stick" href="http://blog.jebpages.com/archives/run-openshift-origin-from-livecd-and-make-it-stick/">I installed from the LiveCD</a>. I'm copying that image from my notebook, where I've been running it on KVM using virt-manager, to my newly-assembled oVirt rig (which I mean to blog about soon) using the handy virt-v2c utility. [<a href="https://bugzilla.redhat.com/show_bug.cgi?id=822221">dang, stuck there, too</a>]</p>
+<p>More to come...</p>
+<p>[UPDATE 5/20/12]</p>
+<p>Another weekend, another shot at the BYOP. I restored my host back to a "fresh install" snapshot, followed all the directions, and am stuck again at the end of the directions. Getting the error: /usr/lib/ruby/gems/1.8/gems/uplift-bind-plugin-0.8.3/lib/uplift-bind-plugin/uplift/bind_plugin.rb:8: uninitialized constant StickShift::DnsService (NameError).</p>

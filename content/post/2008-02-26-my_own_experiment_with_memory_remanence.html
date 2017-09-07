@@ -1,0 +1,51 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2008-02-26T17:09:17Z
+excerpt: |
+  When I read about the recent Princeton University paper on subverting hard drive encryption by fishing for encyption keys in system RAM, I got to wondering about the vulnerability of my own Ubuntu-powered notebook computer.
+
+  After all, support for out-of-the-box hard drive encryption is one of the reasons why I opt for Ubuntu for my primary work machine. Ubuntu inherits this capability from Debian, which introduced the security feature in its Etch release, and, surprisingly, Fedora and OpenSUSE still lack support for configuring hard drive encryption at install time (you may, however, hack your way to hard drive encryption on these or any other Linux system).
+
+  I was interested to find that the Web site at which the Princeton paper is hosted offers up an "try-it-at-home" experiment in memory remanence--which forms the foundation of the encryption exploit.
+meta:
+  _publicize_job_id: "15853825513"
+  _wp_old_slug: "2026"
+  original_post_id: "2026"
+published: true
+status: publish
+tags:
+- FE
+title: My Own Experiment with Memory Remanence
+type: post
+url: /2008/02/26/my_own_experiment_with_memory_remanence/
+---
+
+<p>
+When I <a href="http://www.eweek.com/c/a/Security/Researchers-Crack-BitLocker-FileVault/">read about</a> the recent Princeton University paper on subverting hard drive encryption by fishing for encyption keys in system RAM, I got to wondering about the vulnerability of my own Ubuntu-powered notebook computer.</p>
+<p>
+After all, support for out-of-the-box hard drive encryption is one of the reasons why I opt for Ubuntu for my primary work machine. Ubuntu inherits this capability from Debian, which introduced the security feature in its Etch release, and, surprisingly, Fedora and OpenSUSE still lack support for configuring hard drive encryption at install time (you may, however, hack your way to hard drive encryption on these or any other Linux system).</p>
+<p>
+I was interested to find that the Web site at which the Princeton paper is hosted offers up an "try-it-at-home" experiment in memory remanence--which forms the foundation of the encryption exploit.</p>
+<p>
+When I saw that this story had popped up again, this time in the form of a justification for Apple's characteristically hardware restrictive practice of soldering the RAM of the Macbook Air into place, I thought I'd try the experiment out on my own system and report the results.</p>
+<p>
+As directed in the <a href="http://citp.princeton.edu/memory/exp/">experiment guide</a>, I cheffed up a small python program with which to fill my RAM with a recognizable keyword, Argon (the pirate's favorite chemical element), I ran the program, watched GNOME's system monitor panel applet to see my RAM fill up, and then I held down my power button to brusquely shut off my system.</p>
+<p>
+I then booted back up, typed in my encryption passphrase, and typed "sudo strings /dev/mem &gt; Desktop/mem.txt" into a terminal to see if any of that pirate keyword booty still lurked in my 3GB of RAM. Here's what I found:</p>
+<p>
+<img alt="booty.jpg" src="{{ site.baseurl }}/assets/booty.jpg" width="549" height="321" /></p>
+<p>
+No argon to be found, which bodes well, at least initially. The Princeton researchers offer on their site a handful of reasons why my RAM might have been wiped:</p>
+<blockquote><p>If you don't see any copies of the pattern, possible explanations include (1) you have ECC (error-correcting) RAM, which the BIOS clears at boot; (2) your BIOS clears RAM at boot for another reason (try disabling the memory test or enabling "Quick Boot" mode); (3) your RAM's retention time is too short to be noticeable at normal temperatures. In any case, your computer might still be vulnerable -- an attacker could cool the RAM so that the data takes longer to decay and/or transfer the memory modules to a computer that doesn't clear RAM at boot and read them there.</p></blockquote>
+<p>
+And, of course, my Thinkpad doesn't sport soldered-in RAM, so evil-doers might be able to drop my notebook into a chill chest, pop out the RAM, and go journeying through my sensitive review notes and voluminous personal musings about getting better organized.</p>
+<p>
+If I figure out a way to make this experiment work, I'll be sure to update you.</p>
+<p /></p></p></p></p></p>

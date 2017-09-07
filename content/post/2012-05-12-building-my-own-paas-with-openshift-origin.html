@@ -1,0 +1,47 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-05-12T15:42:24Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856510207"
+  _wp_old_slug: "253"
+  original_post_id: "253"
+published: true
+status: publish
+tags: []
+title: Building My Own PaaS with OpenShift Origin
+type: post
+url: /2012/05/12/building-my-own-paas-with-openshift-origin/
+---
+
+<p>I'm working through the OpenShift Origin <a href="https://openshift.redhat.com/community/wiki/build-your-own">Build Your Own PaaS</a> howto, which says:</p>
+<blockquote><p>Several of the cartridge packages have additional third party dependencies. These have not yet been resolved for the open source environment. Work is actively progressing.</p></blockquote>
+<p>On my Fedora 16 host, these are the cartridges that wouldn't install for missing dependencies:</p>
+<ul>
+<li>cartridge-jbossas-7.noarch : Provides JBossAS7 support</li>
+<li>cartridge-jenkins-1.4.noarch : Provides jenkins-1.4 support</li>
+</ul>
+<p>These are the ones that would install:</p>
+<ul>
+<li>cartridge-10gen-mms-agent-0.1.noarch : Embedded 10gen MMS agent for performance monitoring of MondoDB</li>
+<li>cartridge-cron-1.4.noarch : Embedded cron support for express</li>
+<li>cartridge-diy-0.1.noarch : Provides diy support</li>
+<li>cartridge-jenkins-client-1.4.noarch : Embedded jenkins client support for express</li>
+<li>cartridge-mongodb-2.0.noarch : Embedded mongodb support for OpenShift</li>
+<li>cartridge-mysql-5.1.noarch : Provides embedded mysql support</li>
+<li>cartridge-nodejs-0.6.noarch : Provides Node-0.6 support</li>
+<li>cartridge-perl-5.10.noarch : Provides mod_perl support</li>
+<li>cartridge-php-5.3.noarch : Provides php-5.3 support</li>
+<li>cartridge-phpmyadmin-3.4.noarch : Embedded phpMyAdmin support for express</li>
+<li>cartridge-python-3.2.noarch : Provides python-wsgi-3.2 support</li>
+<li>cartridge-ruby-1.1.noarch : Provides ruby rack support running on Phusion Passenger</li>
+</ul>
+<p>More to come.</p>
+<div></div>

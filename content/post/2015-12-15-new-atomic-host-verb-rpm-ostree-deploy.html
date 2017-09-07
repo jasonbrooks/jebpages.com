@@ -1,0 +1,73 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2015-12-15T13:37:29Z
+meta:
+  _publicize_done_12821151: "1"
+  _publicize_done_12821160: "1"
+  _publicize_done_12822612: "1"
+  _publicize_done_external: a:2:{s:7:"twitter";a:1:{i:12817127;s:57:"https://twitter.com/jasonbrooks/status/676878821824434176";}s:8:"facebook";a:1:{i:12817134;s:38:"https://facebook.com/10154150088164578";}}
+  _wpas_done_12817127: "1"
+  _wpas_done_12817134: "1"
+  _wpas_done_12818529: "1"
+  _wpcom_is_markdown: "1"
+  blog_id: "12666854"
+  is_reblog: "1"
+  post_id: "1553"
+  publicize_google_plus_url: https://plus.google.com/+JasonBrooks0/posts/5iKjiQKU1gs
+  publicize_twitter_user: jasonbrooks
+  reblog_snapshot: |-
+    O:8:"stdClass":7:{s:5:"title";s:39:"New Atomic Host verb: rpm-ostree deploy";s:4:"type";s:4:"post";s:9:"mime_type";s:0:"";s:6:"format";b:0;s:12:"modified_gmt";s:19:"2015-12-15 20:53:02";s:9:"permalink";s:72:"http://blog.verbum.org/2015/12/15/new-atomic-host-verb-rpm-ostree-deploy";s:7:"content";s:4141:"<div class="reblogged-content">
+
+    TL;DR: We've improved the host version management in <a href="https://getfedora.org/cloud/download/atomic.html">Fedora Atomic Host</a>, and you can now use <tt>atomic host deploy $version</tt> to atomically switch to a well-known version.
+
+    Longer version:
+
+    The awesome <a href="http://cockpit-project.org/">Cockpit</a> project has been working on a UI for managing Atomic Host/OSTree updates. See <a href="https://github.com/cockpit-project/cockpit/wiki/Atomic:-OSTree-Update">this page</a> for some background on their design.
+
+    If you download the most recent <a href="https://getfedora.org/cloud/download/atomic.html">Fedora Atomic Host</a> release, then <code>atomic host upgrade</code>, you'll get a <a href="https://github.com/projectatomic/rpm-ostree/releases/tag/v2015.10">new rpm-ostree release</a> which in turn has a new "deploy" verb.  This was created to help implement the above Cockpit design; it's a command line talking to code equivalent to what the <a href="https://github.com/cockpit-project/cockpit/pull/2884">Cockpit UI pull request</a> will use.
+
+    This is noteworthy for several reasons. First, it really unlocks the "server side history" aspect of OSTree for the host tree. This is similar to tagged builds in a Docker repository for a container.
+
+    In order to explain this, one needs to understand that currently in Fedora, there is at most one content release per day. This is true of the traditional single "big repository of RPMs", and also the OSTree commits derived from that used for Atomic Host.
+
+    OSTree has support for a metadata key per commit called <tt>ostree.version</tt> which is what you see when you type <tt>atomic host status</tt>. At present, we're implementing a model where the version numbers are of the form "$major.$increment", and at the time of this writing the version is 23.33, or 33 commits from release.
+
+    With that background out of the way, the interesting thing about the new <tt>rpm-ostree deploy</tt> (mapped via <tt>atomic host deploy</tt>) command is it allows you atomically switch one or more in a cluster of machines to a pre-determined version you have tested and validated.
+
+    For example, if you're trying the current Fedora Atomic Host build, you can invoke:
+
+    <pre># atomic host deploy 23.32
+
+    ...
+
+    Transaction complete; bootconfig swap: no deployment count change: 0
+    Freed objects: 2.1 kB
+    Changed:
+    krb5-libs 1.14-3.fc23 -&gt; 1.14-2.fc23
+    lua 5.3.2-2.fc23 -&gt; 5.3.0-4.fc23
+    Run "systemctl reboot" to start a reboot
+    </pre>
+
+    If you contrast this with the traditional <tt>yum update</tt> or <tt>atomic host upgrade</tt> - these commands will both by default pick the latest versions of the components. If the OS vendor is providing updates while you're in the middle of an upgrade, you could get hosts with a mix of updated or not, with changes you haven't validated.
+
+    Now of course, there are several projects which help in implementing versioning on top of the OS vendor content. The <a href="http://www.pulpproject.org/">Pulp</a> project is an example which allows importing upstream RPM (or other) content, and managing well-known snapshots of it. Then you configure your client machines to pull from those immutable snapshots, rather than directly from upstream.
+
+    Doing this sort of downstream repository management makes a lot of sense for greater than small scales - among other things one often wants local mirroring as well. But even with a local versioned content mirror, it can be very convenient to have the intelligence to traverse the repository history built into the client. It also helps the repository management case as it can reuse the upstream versions, rather than trying to synthesize them downstream.
+
+    There's a lot more work to do on top of this of course. I just posted <a href="https://lists.fedoraproject.org/archives/list/cloud%40lists.fedoraproject.org/thread/GFL2V7A2ISGBMXTPKZF72F3HJONLPFSJ/">a proposal for reworking the commit stream</a> which I think would make this nicer. And the above linked <a href="https://github.com/cockpit-project/cockpit/pull/2884">Cockpit pull request</a> will be very cool to see!</div>";}
+published: true
+status: publish
+tags: []
+title: 'New Atomic Host verb: rpm-ostree deploy'
+type: post
+url: /2015/12/15/new-atomic-host-verb-rpm-ostree-deploy/
+---
+
+<p>This is cool. Also, I'm trying out reblog.</p>

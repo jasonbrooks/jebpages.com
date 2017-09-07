@@ -1,0 +1,100 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2016-01-28T17:07:14Z
+meta:
+  _publicize_done_12821151: "1"
+  _publicize_done_12822612: "1"
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:12817127;s:57:"https://twitter.com/jasonbrooks/status/692876654654296064";}}
+  _publicize_job_id: "19231850998"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpas_done_12817127: "1"
+  _wpas_done_12818529: "1"
+  _wpas_skip_12817134: "1"
+  _wpcom_is_markdown: "1"
+  publicize_google_plus_url: https://plus.google.com/+JasonBrooks0/posts/63utajoZMdW
+  publicize_twitter_user: jasonbrooks
+published: true
+status: publish
+tags: []
+title: You don't want a custom tree, you want atomic-pkglayer
+type: post
+url: /2016/01/28/you-dont-want-a-custom-tree-you-want-atomic-pkglayer/
+---
+
+<p>Atomic system updates are at least half of how <a href="http://www.projectatomic.io/download/">"Atomic Hosts"</a> earn their Fallout-flavored appellation. Where a standard Fedora, RHEL or CentOS host gets its updates from a sack of RPMs downloaded from various repositories and exploded out where appropriate, the Atomic editions of these distros consume this same software in pre-exploded-and-composed-into-an-image form.</p>
+<p>One tricky element of consuming your RPMs in a single blob is choosing a package or two to add beyond what's been composed into the image. I wanted to do this straightaway after learning about the atomic host concept, and I (semi)helpfully documented my progress with composing custom trees in a few different spots, most recently at: <a href="http://www.projectatomic.io/docs/compose-your-own-tree/">Compose Your Own Atomic Updates</a>.</p>
+<p>This works pretty well, but composing and rebasing to a tree of your own is sort of a heavy approach. Shouldn't you be able to compose just part of a tree, and, like, overlay those packages on your atomic host?</p>
+<p>OSTree mastermind Colin Walters has whipped up <a href="https://github.com/cgwalters/atomic-pkglayer">just such a utility</a>, and today, I took it for a spin with <a href="https://wiki.centos.org/SpecialInterestGroup/Atomic/Download/">CentOS Atomic Host</a>.</p>
+<p>I started with a CentOS Atomic Host vagrant box, which, as you'll see, doesn't include the <code>fortune-mod</code> package:</p>
+<p>[code lang=text]<br />
+[laptop-host]$ vagrant init centos/atomic-host</p>
+<p>[laptop-host]$ vagrant up</p>
+<p>[laptop-host]$ vagrant ssh</p>
+<p>[atomic-vm]$ fortune<br />
+bash: fortune: command not found<br />
+[/code]</p>
+<p>I need to grab Colin's tool from git, which is also not included in the CentOS Atomic Host, but which is available in the friendly centos/tools container. For a bit of info about the Fedora flavor of this container, <a href="http://www.projectatomic.io/blog/2015/09/introducing-the-fedora-tools-image-for-fedora-atomic-host/">see here</a>.</p>
+<p>[code lang=text]<br />
+[atomic-vm]$ sudo atomic run centos/tools</p>
+<p>[tools-container]$ cd /root</p>
+<p>[tools-container]$ git clone https://github.com/cgwalters/atomic-pkglayer/</p>
+<p>[tools-container]$ cd atomic-pkglayer</p>
+<p>[tools-container]$ git checkout v2016.1<br />
+[/code]</p>
+<p>atomic-pkglayer requires ostree to function, and this package is missing from the centos/tools container, so I need to grab it from the repo below. Also, fortune-mod lives in EPEL, so I'll install that repo as well.</p>
+<p>[code lang=text]<br />
+[tools-container]$ curl -O https://raw.githubusercontent.com/CentOS/sig-atomic-buildscripts/downstream/rhel-atomic-rebuild.repo</p>
+<p>[tools-container]$ mv rhel-atomic-rebuild.repo /etc/yum.repos.d/</p>
+<p>[tools-container]$ yum install ostree epel-release -y<br />
+[/code]</p>
+<p>Now I need to grab all the rpms required for fortune-mod, and install them to a pkglayer, before exiting my tools container, rebooting my atomic VM, and logging back in to the rebooted atomic VM:</p>
+<p>[code lang=text]<br />
+[tools-container]$ mkdir pkgs</p>
+<p>[tools-container]$ yumdownloader --resolve --destdir=pkgs fortune-mod</p>
+<p>[tools-container]$ /root/atomic-pkglayer/atomic-pkglayer pkgs/*rpm</p>
+<p>[tools-container]$ exit</p>
+<p>[atomic-vm]$ sudo reboot</p>
+<p>[laptop-host]$ vagrant ssh<br />
+[/code]</p>
+<p>Now, for some fortune:</p>
+<p>[code lang=text]<br />
+[atomic-vm]$ fortune<br />
+Rune&#039;s Rule:<br />
+    If you don&#039;t care where you are, you ain&#039;t lost.<br />
+[/code]</p>
+<p>You can see my local overlay:</p>
+<p>[code lang=text]<br />
+[atomic-vm]$ sudo atomic host status<br />
+TIMESTAMP (UTC)         VERSION        ID             OSNAME                 REFSPEC<br />
+* 2016-01-29 00:30:06     local          0aa16a3e42     centos-atomic-host     &lt;unknown origin type&gt;<br />
+  2015-10-01 09:32:09     7.20151001     1e9838ce88     centos-atomic-host     centos-atomic-host:centos-atomic-host/7/x86_64/standard<br />
+[/code]</p>
+<p>The system is left in an un-upgradable state -- I'll need to rollback before I can grab updates again, so this overlay is temporary:</p>
+<p>[code lang=text]<br />
+[atomic-vm]$ sudo atomic host upgrade<br />
+error: No origin/refspec in current deployment origin; cannot upgrade via ostree</p>
+<p>[atomic-vm]$ sudo atomic host rollback<br />
+Moving &#039;1e9838ce8879112c47c72503bbade0830e6f06dc20f5cabbf6da40a373550f69.0&#039; to be first deployment<br />
+Transaction complete; bootconfig swap: no deployment count change: 0<br />
+Removed:<br />
+  fortune-mod-1.99.1-17.el7.x86_64<br />
+  recode-3.6-38.el7.x86_64<br />
+Successfully reset deployment order; run &quot;systemctl reboot&quot; to start a reboot</p>
+<p>[atomic-vm]$ sudo systemctl reboot</p>
+<p>[laptop-host]$ vagrant ssh<br />
+[/code]</p>
+<p>Post-rollback, the fortune command is missing once again, and my system is ready for upgrades again:</p>
+<p>[code lang=text]<br />
+[atomic-vm]$ fortune<br />
+bash: fortune: command not found</p>
+<p>[atomic-vm]$ sudo atomic host upgrade<br />
+Updating from: centos-atomic-host:centos-atomic-host/7/x86_64/standard<br />
+[/code]</p>

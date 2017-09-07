@@ -1,0 +1,34 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2007-03-12T09:39:23Z
+meta:
+  _publicize_job_id: "15853823482"
+  _wp_old_slug: "1978"
+  original_post_id: "1978"
+published: true
+status: publish
+tags:
+- FE
+title: NAC Is Whack?
+type: post
+url: /2007/03/12/nac_is_whack/
+---
+
+<p>Network access control schemes seem to be all the rage, with IT heavyweights and smaller players alike pushing them full force.<br />
+While there's no disputing that these NAC initiatives are aimed at worthwhile goals, what remains to be seen is whether and to what extent these initiatives are worth the time and money that enterprises must lay out to implement them.<br />
+In other words, is NAC all it's cracked up to be? I have my doubts, specifically concerning the portion of NAC involving network endpoint assessment--the proposition that by quizzing a client about its operating system, patch level and anti-virus signature currency, it's possible to determine whether that client may be trusted.<br />
+My initial concern, as a user of desktop Linux and a proponent of keeping one's client platform options open, is that NAC could erect new barriers to running non-Windows operating systems. I see the technology landscape teeming with all sorts of new clients, and if using networked services is to require not only the capability to talk across the network but also to satisfy some necessarily narrow-minded health monitor, many of those potential networked clients could be kept out.<br />
+Of course, it's the right and, certainly, the responsibility of administrators of a well-managed enterprise infrastructure to exert control over the users and clients that access their networked services. However, it seems to me that for a company's well-managed clients, NAC's security posture checking is redundant--a managed system won't be running unvetted software, and administrators of these machines will already have the authority to enforce vulnerability and anti-virus updates.<br />
+For systems that an IT organization does not manage tightly, such as the personal systems of telecommuters or the laptops of partners' employees, NAC can't be enough to offer acceptable health guarantees. Who knows what malware might lurk on your employees' home machines, regardless of what the client reports about its own health?<br />
+What's more, the managed clients of your partners won't necessarily be managed under the same policies you've chosen to mandate. For instance, what happens when your idea of system health equals a completely patched system, and one of your partners has held back a particular patch due to some incompatibility it introduces with one of their key applications?<br />
+The answer, in the cases both of the partner-policy conflict and the non-supported client scenarios, is that you'd create exceptions. With the constant stream of OS patches and anti-virus signature updates--and the unforeseen conflicts among them--NAC seems to me like an ongoing policy-writing nightmare. At the very least, it sounds like more work than already overworked IT departments are probably prepared to assume.<br />
+Rather than pursue assurances of health that you can't completely trust from endpoints that you can't completely control--at the expense of implementing, deploying and managing NAC policies, software and hardware for an as-yet-unproven return--companies would do better to focus on hardening their clients and servers to better withstand the malware that will inevitably worm its way into their networks.<br />
+On the server side, companies would do well to focus on the security functionality that's beginning to flow from niche trusted operating systems into mainstream platforms such as Linux and Solaris. On the client side, companies should tighten their management grip over the systems they own. Where that's not possible, companies should explore methods of carving out reasonably secure beachheads within otherwise unmanaged clients, such as through virtual machines or terminal services.<br />
+Yes, it'd be nice if there were a way to sniff at a client and arrive, automagically, at a state of confidence in which that client could be trusted. Not even the most ardent supporter of NAC would suggest that the technology is currently capable of such a feat. Until such assurances can be reliably obtained, let's worry less about implementing trustability and prepare ourselves instead for suspicion.</p>

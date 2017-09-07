@@ -1,0 +1,32 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-11-19T12:22:22Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856512114"
+  _wp_old_slug: "453"
+  original_post_id: "453"
+published: true
+status: publish
+tags:
+- openshift
+title: openshift and some php app debugging
+type: post
+url: /2012/11/19/openshift-and-some-php-app-debugging/
+---
+
+<p>This morning I was trying to help figure out why a slick new Mediawiki skin was working just fine on an OpenShift-hosted Mediawiki instance, but was totally borked on a second Mediawiki instance, running on a VPS server.</p>
+<p>Both the VPS and OpenShift run on the same OS: Red Hat Enterprise Linux. Both were running the same version of Mediawiki, 1.19.2, both had the same version of PHP: 5.3.3.</p>
+<p>I compared the php.ini file from the VPS machine with the php.ini from OpenShift, which is findable at ~/php-5.3/conf/php.ini in your OpenShift gear. (You can ssh into your OpenShift instance at the remote "origin" location in your APPNAME/.git/config file).</p>
+<p>I found a handful of differences in the ini files, including the promising-looking "short_open_tag" boolean. In my OpenShift app, this was set to "on" and in the VPS, it was set to "off."</p>
+<p>I wanted to fiddle with this setting on OpenShift, to see if I could make the skin break in the same way it was breaking on the VPS, but you can't modify your app's php.ini directly in OpenShift. You can, however, change these settings <a href="https://openshift.redhat.com/community/forums/openshift/how-to-change-the-magicquotesgpc-setting-on-a-php-53-app">in your .htaccess file</a>.</p>
+<p>In my app repo, I created the file "php/.htaccess" including the line 'php_value short_open_tag "Off"' to match the VPS server. After pushing this change up to OpenShift, my Mediawiki instance broke in just the same way that it was breaking on the VPS machine. Broken instance FTW!</p>
+<p>After swapping the value to "On" and pushing the change again, my test Mediawiki instance was back up and running.</p>
+<p>&nbsp;</p>

@@ -1,0 +1,66 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-04-30T17:48:32Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856510136"
+  _wp_old_slug: "243"
+  original_post_id: "243"
+published: true
+status: publish
+tags:
+- openshift
+- openshift origin
+- wordpress
+title: Run OpenShift Origin from LiveCD, and Make it Stick
+type: post
+url: /2012/04/30/run-openshift-origin-from-livecd-and-make-it-stick/
+---
+
+<p><em>The OpenShift Origin LiveCD will have you up and running with the code that backs Red Hat's PaaS in a flash, but installing the LiveCD to your hard drive requires a few workaround steps.<img class="alignright size-medium wp-image-244" title="LiveCD" src="{{ site.baseurl }}/assets/LiveCD-300x223.png" alt="" width="300" height="223" /></em></p>
+<p>[<strong>UPDATE</strong>: Check out <a href="https://openshift.redhat.com/community/wiki/build-your-own-paas-from-the-openshift-origin-livecd-using-liveinst">wiki-fied, updated version of this howto</a> at the OpenShift Origin community site.]</p>
+<p>Today, Red Hat delivered on its pledge to open the source code and development process behind its Platform as a Service offering, OpenShift. To help avoid confusion between the Red Hat-hosted service and the open source project and code base, the project is named <a href="https://openshift.redhat.com/community/open-source" target="_blank">OpenShift Origin</a>.</p>
+<p>The OpenShift Origin source code is available at <a href="https://github.com/openshift/crankcase" target="_blank">github.com/openshift</a>, and <a href="https://openshift.redhat.com/community/wiki/build-your-own#Openshift_RPM_Repositories" target="_blank">software packages</a> for Fedora 16 and RHEL 6 are available for download and installation, as well. At this point, though, the fastest way to get and and running with OpenShift Origin is to <a href="https://openshift.redhat.com/community/wiki/getting-started-with-openshift-origin-livecd" target="_blank">download this LiveCD image</a> and fire it up on a VM or spare machine.</p>
+<p>The LiveCD will boot you straight into a graphical desktop session, based on Fedora, from which you can create a domain and some sample applications. It couldn't be much easier to use, but as with most LiveCDs, the environment goes away once you reboot. Also, the LiveCD sets you up to interact with any applications you install through the web browser and terminal window in the LiveCD environment. I prefer to use the browser in my regular desktop environment.<img class="alignright size-medium wp-image-245" title="install-error" src="{{ site.baseurl }}/assets/install-error-300x120.png" alt="" width="300" height="120" /></p>
+<p>Fedora LiveCDs come with a nifty "install to hard drive" option, but in order to install the OpenShift Origin LiveCD to a drive (whether physical or virtual) a couple workaround steps are currently required:</p>
+<ol>
+<li>Download LiveCD and boot a VM with it. The project wiki includes instructions for setting up a VM with VirtualBox. I used KVM and virt-manager on my Fedora 17 desktop.</li>
+<li>In the terminal window that pops up once the LiveCD has finished booting, type "su" to become the superuser.</li>
+<li>The OpenShift Origin environment requires that NetworkManager be disabled, but the system installer requires NetworkManager. Enable NetworkManager by adding the line "NM_CONTROLLED=yes" (no quotes) to your network adapter's config file. Assuming your network adapter is named eth0, this command ought to do the trick: "echo NM_CONTROLLED=yes &gt;&gt; /etc/sysconfig/network-scripts/ifcfg-eth0"</li>
+<li>Restart the network service: "service network restart"</li>
+<li>Start the NetworkManager service: "service NetworkManager start"</li>
+<li>Start the installer: "liveinst"</li>
+<li>Go through text-based install steps, finally rebooting your VM, and logging in as root.</li>
+<li>I'm not positive which firewall ports must be open, so for now I'm just disabling the firewall with: "system-configure-firewall-tui"</li>
+<li>Run "ifconfig" to figure out the IP address of your VM, and head out to your regular desktop environment to carry out a bit more configuration, and to start using your mini me PaaS installation.</li>
+<li>If you're interested enough in OpenShift to be running OpenShift Origin on one of your own machines, I'm assuming that you've already <a href="https://openshift.redhat.com/app/getting_started" target="_blank">tried out the full-sized</a>, Red Hat-hosted OpenShift service. If so, you'll want to create a new config file to use with your locally-hosted OpenShift instance, otherwise the rhc client will default to talking to the OpenShift servers off in the clouds.  I created a file called express.conf containing two lines: "default_rhlogin=admin" and "libra_server=YOUR_VM_ADDRESS".</li>
+<li>Next, I created a domain on my OpenShift Origin instance, making sure to append the path to my alternate config file: "rhc domain create -n origin --config=/home/jason/Desktop/express.conf". When prompted for a password, use "admin".</li>
+<li>Now, you're ready to install an application. I'm partial to <a href="https://github.com/openshift/wordpress-example" target="_blank">Wordpress as a demo app</a> (my blog is powered by Wordpress+OpenShift) but if you'd like to try a different app, here's a <a href="https://openshift.redhat.com/community/developers/get-started" target="_blank">big list of easily-deployed quickstarts</a>.</li>
+<li>Start following the instructions at the Wordpress quickstart, making sure to append your alternate config file like so:
+<pre>rhc app create -a wordpress -t php-5.3 --config=/home/jason/Desktop/express.conf</pre>
+</li>
+<li>Your OpenShift Origin will create the new PHP app, and then time out trying to resolve its DNS name. Since we're interacting with our PaaS from outside of the LiveCD environment, we lose the LiveCD's automatic DNS magic, and have to make things resolve properly on our own. I made things resolve properly by adding a line to my /etc/hosts file, associating my VM address with the my appname-domainname at the example.com domain to which the LiveCD defaults:
+<pre>192.168.122.147 wordpress-origin.example.com</pre>
+</li>
+<li>The DNS time-out message we received in step 14 includes a git clone command for pulling down your skeleton app structure from your PaaS instance. Run it.</li>
+<li>We need to give our wordpress app a mysql database to work with. There's a command for this in the quickstart, to which we'll again append our alternate config file:
+<pre>rhc app cartridge add -a wordpress -c mysql-5.1 --config=/home/jason/Desktop/express.conf</pre>
+</li>
+<li>We're near the end. Next (and these steps are straight out of the Wordpress quickstart) we cd into the app directory, hook up to the wordpress example git repo, pull the code down from there, and then push it up into our OpenShift Origin instance:
+<pre>cd wordpress
+git remote add upstream -m master git://github.com/openshift/wordpress-example.git
+git pull -s recursive -X theirs upstream master
+git push</pre>
+</li>
+<li>If you're following along with me, you should now have a shiny new Wordpress instance available at http://wordpress-origin.example.com, with your default admin user name and password listed in your terminal window following the "git push."</li>
+</ol>
+<p><img class="size-medium wp-image-246 alignright" style="color:#333333;font-style:normal;line-height:24px;border-style:initial;border-color:initial;" title="origin-wordpress" src="{{ site.baseurl }}/assets/origin-wordpress-300x272.png" alt="" width="300" height="272" /></p>
+<p>So that's it. You have your very own PaaS instance running on a local VM that won't go away between reboots.</p>
+<p>The open sourcing of OpenShift is a big deal, but the best PaaS is the one you don't have to operate yourself. That's why, as the only current downstream project implementing OpenShift Origin, Red Hat's OpenShift service remains the best place for people to get acquainted with the project. Here's hoping that not too much time passes before a bunch of rival implementations hit the scene to give Red Hat a run for its money!</p>

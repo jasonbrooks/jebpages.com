@@ -1,0 +1,29 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-06-13T07:37:10Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856510571"
+  _wp_old_slug: "315"
+  original_post_id: "315"
+published: true
+status: publish
+tags:
+- fedora
+- ovirt
+title: preupgrade gone wrong
+type: post
+url: /2012/06/13/preupgrade-gone-wrong/
+---
+
+<p><img class="aligncenter size-full wp-image-316" title="preupgrade gone wrong" src="{{ site.baseurl }}/assets/Screenshot-from-2012-06-12-214316.png" alt="" width="702" height="558" /></p>
+<p>Having reached a good break point in <a title="Fedora 17, OpenStack Essex &amp; Gluster 3.3: All Smushed Together" href="http://blog.jebpages.com/archives/fedora-17-openstack-and-gluster-3-3/">my Gluster/Openstack/Fedora tests</a>, I thought I'd <a href="http://fedoraproject.org/wiki/How_to_use_PreUpgrade">preupgrade</a> the F16 VM I've been using for ovirt engine to F17, en route to the oVirt 3.1 beta.</p>
+<p>That didn't go so well. During the post-preupgrade part (uh, the upgrade), the installer balked at upgrading the jboss-as package that shipped with oVirt 3.0. Afterward, the VM wouldn't boot correctly.</p>
+<p>Fortunately, I was prepared for failure, detaching my iso domain in advance, and shuttling the templates and VMs I wanted to keep to the export domain, which I also detached.</p>

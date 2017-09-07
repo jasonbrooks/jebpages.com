@@ -1,0 +1,51 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2009-01-28T15:01:36Z
+excerpt: "The problem with having a big and bountiful network of Twitter friends is
+  that once your friends list grows beyond a fairly small number of people, it gets
+  really tough to pay attention to what people are saying.\r\nHowever, I think I have
+  a plan for keeping Twitter useful to me, even as my friends list continues to grow."
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15853827968"
+  _wp_old_slug: "2073"
+  _wpcom_is_markdown: "1"
+  geo_public: "0"
+  original_post_id: "2073"
+published: true
+status: publish
+tags:
+- FE
+title: How I Harness My Twitter Stream
+type: post
+url: /2009/01/28/how_i_harness_my_twitter_stream/
+---
+
+<p>
+For the past few months, I've been using <a href="http://en.wikipedia.org/wiki/Twitter" target="_blank">Twitter,</a> the microblogging service that you may well be <a href="http://news.google.com/news?q=site:eweek.com+twitter" target="_blank">sick of hearing about.</a></p>
+<p>Right off the bat, I was attracted to Twitter because the 140 characters per entry that Twitter allows add up to about as much blog as I'm capable of mustering at most times.<span class="mt-enclosure mt-enclosure-image" style="display:inline;"><img alt="reader-twitter.png" src="{{ site.baseurl }}/assets/Screenshot-9.png" width="350" height="227" class="mt-image-right" style="float:right;margin:0 0 20px 20px;" /></span><br />
+For me, microblogging just for the sake of it hasn't been engaging enough to hold my interest, but what has kept me coming back to Twitter has been the growing network of people I follow.</p>
+<p>I love to dip my Twitter cup into the stream of chatter from the people who build and use the products and services that I test and write about at eWEEK. It's also interesting to hear what other media types are talking about, although too much of that can lead to head-bursting echo chamber periods where my peers make exactly the same comments about Steve Jobs for days on end.</p>
+<p>But the main problem with a big and bountiful network of Twitter friends is that once your friends list grows beyond a fairly small number of people, it gets really tough to pay attention to what people are saying.</p>
+<p>Things get even worse when you follow megaprolific Tweetsmiths who tend to flood your Twitter stream with their chatter, or if you follow news organizations that post links to all of their stories on Twitter. This weekend, I followed the Huffington Post for about 10 minutes before deciding that I couldn't afford to pay attention to all of the site's output--I'd never get to see Tweets from anyone else!</p>
+<p>It's too bad, because another really great thing about Twitter is the amount of standardization the service imposes on content producers. Everyone gets 140 characters, and any images or videos or sound files or advertisements have to live behind an embedded link.</p>
+<p>In contrast, my Google Reader is a mess of differently formatted entries, some containing only a headline, some with long, picture-laden, full-sized stories, some with way more advertisements than actual content, some with embedded videos or podcasts.</p>
+<p>When I fire up Reader and set out to peruse my many RSS subscriptions, I'm constantly context-switching, stopping for a moment to figure out what I'm looking at, rather than mechanically scanning for what's interesting.</p>
+<p>Recently, while checking out the renovations that Google made to Reader in late 2008, I spied the heading "Stay connected to friends &amp; family" within the application's feed browsing interface. One of the drop-down options under the heading was Twitter--you can type in the name of a Twitter user and consume that user's status updates through RSS. You can also subscribe to someone's status update RSS feed right from his or her page using the familiar orange radar wave graphic in your browser's address bar.</p>
+<p>I figured that if I followed each of my Twitter friends through Google Reader, I could take advantage of <a href="http://www.google.com/support/reader/bin/answer.py?hl=en&amp;answer=69980" target="_blank">Google's "auto-sort" view mode,</a> which prioritizes feeds with fewer entries to prevent them from being drowned out by fatter feeds. Perfect for the Huffington Post scenario, right?</p>
+<p>What's more, the RSS route could allow me to organize my Twitter friends into groups, and even to unsubscribe from people without unfollowing them. It hasn't been an issue for me, as far as I know, but apparently lots of people get hurt if they don't get a follow, which has led some of Twitter's cooler kids to wish for a "fake follow" feature.</p>
+<p>Now, I wasn't about to enter the names of each of my Twitter friends in Google Reader's little drop-down input box, nor was I going to click the RSS button for each of my more than 300 friends. Twitter does offer an RSS feed that covers all of the people you follow, but one big friend feed wouldn't work with Google's auto-sort.</p>
+<p>I hit the Web and found <a href="http://taint.org/wk/PulseSource" target="_blank">a Perl script called twitter-followers-to-opml,</a> which talks to Twitter, fetches a list of the RSS status feeds of your followers, and spits the list out into OPML, which you can use to populate your feed reader.</p>
+<p>I was looking for the feeds of my friends rather than my followers (although there's significant overlap between the two lists), so I had to make a small change to the script, and swap out followers() for friends() near the top of the script. Also, since the Net::Twitter Perl library on which the script depends only fetches your last 100 friends, I had to figure out how to pass the page=2, page=3, etc., arguments to friends().</p>
+<p><em>NOTE: At the time that I'm writing this post, the link to the script I'm talking about is dead. I'll check back later and update the post. In any case, the script seems fairly straightforward, and probably wouldn't be too tough for an actual hacker (in other words, not me) to throw together. Alternatively, Twitter could make life easier on everyone and add an OPML export option itself.</em></p>
+<p><em>UPDATE: The script page is live again.</em></p>
+<p>I imported all my Twitter friend feeds into Google Reader and tagged them all "twitter," so I could read them at once. Before I left the office yesterday I marked all the items in my Twitter folder as read and came into the office today to find over 1,000 new, auto-sorted tweets waiting for me.</p>
+<p>I like the way that Google Reader lets me scroll down through the tweets, marking them read as I go, and automatically refreshing the list. I scan my tweets, and middle-click the ones that pique my interest for follow-up.</p>
+<p>So far, so good. I'm going to boost my Twitter friend network, refreshing my OPML file to pick up the new friends as I go, and we'll see how well this Reader/Twitter combo works for keeping the flow useful.</p>

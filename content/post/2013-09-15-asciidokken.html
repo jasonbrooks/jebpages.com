@@ -1,0 +1,143 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2013-09-15T12:25:25Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856512449"
+  _wp_old_slug: "535"
+  _wpcom_is_markdown: "1"
+  original_post_id: "535"
+published: true
+status: publish
+tags: []
+title: AsciiDokken
+type: post
+url: /2013/09/15/asciidokken/
+---
+
+<p><img class=" size-full wp-image-7356 alignright" src="{{ site.baseurl }}/assets/asciidokken.jpg" alt="asciidokken" width="400" height="236" /></p>
+<div class="paragraph">
+<p>It’s been a long time since I’ve blogged. My last <a href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-2-edition/">oVirt 3.2 howto</a> has been holding down the front page of this site for a lot of months, and now oVirt 3.3 is <a href="http://community.redhat.com/up-and-running-with-ovirt-3-3/">just around the corner</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Top "haven’t blogged" excuses:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>Such are blogs, they go unupdated, and blog posts often start with "it’s been a long time since I blogged" (see above).</li>
+<li>I’ve been expending a bit of my blogging chi by robotically filling and tweaking the links queue that feeds <a href="http://www.twitter.com/redhatopen">@redhatopen</a>.</li>
+<li>I’ve been gripped somewhat by analysis paralysis over staticly generated site blogging and writing in AsciiDoc.</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It’s this third excuse I’m blogging about today.</p>
+</div>
+<div class="paragraph">
+<p>See, I like to write in plain text — I start out writing almost everything in <a href="https://projects.gnome.org/tomboy/">Tomboy</a> or, if I’m feeling extra distracted, <a href="http://pyroom.org/">PyRoom</a>. The trouble is, plain text isn’t "print" ready (and by print ready, I really mean web ready). Beyond plain text, you need <strong>some</strong> formatting, at the very least, Web links, a few code blocks, a subhead or two.</p>
+</div>
+<div class="paragraph">
+<p>Formatting is lame and boring and adds friction to my writing experience. The way I’ve done it, for years, is to do it after the writing’s done, and to undertake a separate formatting pass for every spot I intend to publish — is this for the Web, where on the Web? Mediawiki? WordPress? Other?</p>
+</div>
+<div class="paragraph">
+<p>I particularly hate writing in word processors, they’re all about formatting, and yet the formatting they produce often isn’t appropriate for most places you’ll end up publishing. For instance, word processors produce famously junky HTML.</p>
+</div>
+<div class="sect1">
+<h2 id="_enter_asciidoc">Enter AsciiDoc</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>My collegaue <a href="https://plus.google.com/114112334290393746697/posts">Dan Allen</a> has been spreading the gospel of <a href="http://www.methods.co.nz/asciidoc/">AsciiDoc</a>, a lightweight plain text markup language, and of <a href="http://asciidoctor.org/news/2013/04/08/a-new-resource-for-asciidoc/">Asciidoctor</a>, a Ruby processor for converting AsciiDoc source files and strings into HTML 5, DocBook 4.5 and other formats.</p>
+</div>
+<div class="paragraph">
+<p>With my plain text orientation, annoyance with formatting gunk, and deep dissatisfaction with word processors, AsciiDoc appealled to me. I know that Markdown is <em>teh hotness</em>, sort of, but AsciiDoc’s formatting for my #1 use case, inserting hyperlinks, is simpler than that for Markdown, and AsciiDoc seems better aligned with my needs overall.</p>
+</div>
+<div class="paragraph">
+<p>As Dan promised, I found it very easy to get rolling with AsciiDoc. You just write, the formatting is simple, and you can do all the sorts of things you need to do, the first time through.</p>
+</div>
+<div class="paragraph">
+<p>It’s simple to add <a href="http://asciidoctor.org/docs/asciidoc-writers-guide/#links-and-images">links and images</a>, and AsciiDoc’s handling of <a href="http://asciidoctor.org/docs/asciidoc-writers-guide/#lists-lists-lists">bullets and numbering</a> has made life easier writing posts and howtos.</p>
+</div>
+<div class="paragraph">
+<p>In fact, after writing in AsciiDoc for the past couple months, I found the other day that I had to look up the syntax for HTML link tags. In AsciiDoc, it’s URL[text] and that’s it.</p>
+</div>
+<div class="paragraph">
+<p>BUT, while you can just start writing in AsciiDoc, you do need some application support to get the full benefit from it. For instance, it’s helpful to get a preview of how your formatted text will render, particularly while learning the syntax. My text editing tools don’t offer this for AsciiDoc, though I’ve been pleased with the setup suggested in this <a href="http://asciidoctor.org/docs/editing-asciidoc-with-live-preview/">Editing w/ Live Preview</a> howto on the Asciidoctor site.</p>
+</div>
+<div class="paragraph">
+<p>The biggest issue, however, is publishing. My blog runs on <a href="http://www.wordpress.org">WordPress</a>, as do a few of the blogs I contribute to for work, and WordPress doesn’t know anything about AsciiDoc. There is, however, a family of blogging engines savvy to AsciiDoc: the Static Site Generators.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_jekyll_hyde_and_friends">Jekyll, Hyde, and Friends</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I’ve been interested in the concept of <a href="http://tom.preston-werner.com/2008/11/17/blogging-like-a-hacker.html">"blogging like a hacker"</a> with a static site generator for some time now. Having a speedy, scaleable blog that needs no software updates and could be <a href="http://www.allthingsdistributed.com/2011/08/Jekyll-amazon-s3.html">hosted from</a> something like Amazon S3 sounds really cool to me.</p>
+</div>
+<div class="paragraph">
+<p>Now, I love WordPress. I do. It’s this big old ball of open source goodness, with a community of users, plugin developers, designers, bloggers, etc. Honestly, yay!</p>
+</div>
+<div class="paragraph">
+<p>But…</p>
+</div>
+<div class="paragraph">
+<p>WordPress Vulnerability of the Day means a constant sense of low-level discomfort — am I up to date? What about my plugins? Are they up to date? And have the latest updates broken compatitbility between plugin and core, somehow?</p>
+</div>
+<div class="paragraph">
+<p>It’s really easy to get going with a nice, functional blog with WordPress. My blog has always been really simple — I made a child theme based on the WordPress 2012 theme simply to hide the gigantic header image, and I may have made a CSS tweak or two.</p>
+</div>
+<div class="paragraph">
+<p>But, some of the work-related WordPress sites I’ve been involved with have required more customization, and when you’re trying to understand how all the parts of a WordPress site fit together, to customize or debug something, it feels crazy — everything’s exploded out into a billion different places.</p>
+</div>
+<div class="paragraph">
+<p>Also, the more I use git (which I really started getting into through <a href="http://www.openshift.com">OpenShift</a>), the more I want to use it, or have the option of using it, for everything. I want to use git for managing posts and such, and WordPress stores everying in a database.</p>
+</div>
+<div class="paragraph">
+<p>And returning to the formatting issue, formatting in WordPress can be a pain. It works like a PHP-based word processor in the sky, for the most part, you WYSIWYG your way along, clicking toolbars and such, but I always need to dip into the HTML view and tweak some things, which I don’t love.</p>
+</div>
+<div class="paragraph">
+<p>My blog isn’t very dynamic, so I don’t need a bunch of PHP code cranking away at every click. I’ve been using Disqus comments, where the dynamic bits happen in the visitor’s browser, so my site could easily be static. In fact, I use wp-super-cache on my site, for performance benefit, so my blog is sort of static anyway.</p>
+</div>
+<div class="paragraph">
+<p>So, between my interest in AsciiDoc and static site generators, and my itching to make a move from WordPress, I figured I’d soon jump from WordPress, to… something else.</p>
+</div>
+<div class="paragraph">
+<p>I’ve fiddled with a few different options, including <a href="http://octopress.org/">Octopress</a>, <a href="http://blog.getpelican.com/">Pelican</a>, <a href="http://ringce.com/hyde">Hyde</a>, and <a href="http://awestruct.org/">Awestruct</a> (another project I hear about through Dan Allen).</p>
+</div>
+<div class="paragraph">
+<p>None of these have been super tough to get up and running, but as with all static site generators, there’s some assembly required, and I have plenty of other bits of software to fiddle with.</p>
+</div>
+<div class="paragraph">
+<p>Converting my posts from WordPress to Awestruct et al is a thing, too, so I’d have to deal with (re)formatting those posts before I started using AsciiDoc for my workflow, and that means worrying about formatting and other distraction before I can start not worrying about formatting and other distraction.</p>
+</div>
+<div class="paragraph">
+<p>So there’s the blog/writing/workflow/migration holding pattern for you.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_asciidokken">AsciiDokken</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>I mentioned, though, that I’ve been using AsciiDoc for a couple months now, and this blog and others are running WordPress. I’ve been using a little tool for <a href="http://srackham.wordpress.com/blogpost-readme/">posting AsciiDoc-formatted texts to WordPress</a>, which has enabled me to start blogging in AsciiDoc without blogging like a hacker. It works pretty well, and handles image uploading, which is nice.</p>
+</div>
+<div class="paragraph">
+<p>I keep my AsciiDoc-formatted posts in a folder on my notebook, with git version control, and I push posts and post updates to WordPress through its API, using the blogpost tool.</p>
+</div>
+<div class="paragraph">
+<p>Just the other day, I spun myself a fresh WordPress blog on OpenShift, with this spiffy new 2013 theme (where disabling the giant header image is an out-of-the-box customization option).</p>
+</div>
+<div class="paragraph">
+<p>So, maybe I’m staying with WordPress for a while.</p>
+</div>
+<div class="paragraph">
+<p>At least, I shouldn’t let indecision over markup and site generation block the flow of public navel-gazing about indecision over markup and site generation. To that end, I’ve started looking into <a href="https://github.com/asciidoctor/asciidoctor/issues/209#issuecomment-24423716">directing more love</a> toward that AsciiDoc-to-WordPress uploader.</p>
+</div>
+</div>
+</div>

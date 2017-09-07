@@ -1,0 +1,88 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2016-07-19T13:24:44Z
+meta:
+  _oembed_4e059305436e0920279699ad77c56604: '{{unknown}}'
+  _oembed_572a02d00e007416cbd31f1b12964ab4: '<div class="embed-twitter"><blockquote
+    class="twitter-tweet" data-width="500"><p lang="en" dir="ltr">Oh hell yes - now
+    run more than 1 container runtime in Kubernetes: Let the wild rumpus begin!<a
+    href="https://t.co/tqMbk39MB1">https://t.co/tqMbk39MB1</a></p>&mdash; TheSteve0
+    (@TheSteve0) <a href="https://twitter.com/TheSteve0/status/754056286870835200">July
+    15, 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js"
+    charset="utf-8"></script></div>'
+  _oembed_c0e7935a70e9edd79251828a40db4a33: <div class="embed-twitter"><blockquote
+    class="twitter-tweet" data-width="500"><p lang="en" dir="ltr">The DMCA is preventing
+    farmers from repairing their own tractors <a href="https://t.co/cdZcDum50c">https://t.co/cdZcDum50c</a>
+    <a href="https://t.co/U1hivT5itK">pic.twitter.com/U1hivT5itK</a></p>&mdash; Alex
+    Sanchez (@_alxsanchez) <a href="https://twitter.com/_alxsanchez/status/755487183839133696">July
+    19, 2016</a></blockquote><script async src="//platform.twitter.com/widgets.js"
+    charset="utf-8"></script></div>
+  _oembed_time_572a02d00e007416cbd31f1b12964ab4: "1468970172"
+  _oembed_time_c0e7935a70e9edd79251828a40db4a33: "1468970172"
+  _publicize_done_12821151: "1"
+  _publicize_done_12822612: "1"
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:12817127;s:57:"https://twitter.com/jasonbrooks/status/755498662269100032";}}
+  _publicize_job_id: "24940603622"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpas_done_12817127: "1"
+  _wpas_done_12818529: "1"
+  _wpcom_is_markdown: "1"
+  publicize_google_plus_url: https://plus.google.com/+JasonBrooks0/posts/KLjoiFb9U12
+  publicize_twitter_user: jasonbrooks
+published: true
+status: publish
+tags:
+- docker
+- fedora
+title: fedora and docker storage
+type: post
+url: /2016/07/19/fedora-and-docker-storage/
+---
+
+<p>While (<a href="https://www.joyent.com/blog/triton-docker-and-the-best-of-all-worlds">pretty</a> <a href="https://msdn.microsoft.com/en-us/virtualization/windowscontainers/quick_start/quick_start_windows_server">much</a>) everyone who's using <a href="https://opensource.com/resources/what-docker">docker</a> is running it on Linux, and while lots of people run docker on their laptops and desktops, most aren't running it directly on Linux desktops and laptops. Instead, most individual docker users are relying on some sort of <a href="https://seven.centos.org/2016/07/new-centos-atomic-host-ready-for-download/">purpose-built</a> <a href="http://boot2docker.io/">Linux distribution</a> running as a virtual machine on their <a href="https://blog.docker.com/2016/03/docker-for-mac-windows-beta/">Mac or Windows</a> machine.</p>
+<p>However, if you are (like me) running Linux on your desktop, you can run docker containers right on your bare metal, with no virtualization overhead in between. Yay, Desktop Linux!</p>
+<p>But wait. If you are (like me) running Fedora Linux on your desktop, and if you (also like me) weren't thinking about docker and its particular storage needs when you installed Fedora on your machine, you could be in for some perplexing issues or at least crap performance, because of the way that docker storage works on Fedora.</p>
+<p>I've written about the general issue elsewhere:</p>
+<blockquote><p>
+  ...the AUFS backend that started out as Docker’s default <a href="http://jpetazzo.github.io/assets/2015-03-03-not-so-deep-dive-into-docker-storage-drivers.html">storage option</a>, but never made its way into the mainlain Linux kernel, posed a problem for Red Hat and our upstream first, no out-of-tree bits ways.<br />
+  <code></code><br />
+  The settled-upon solution was <a href="https://github.com/docker/docker/blob/master/daemon/graphdriver/devmapper/README.md">device mapper thin provisioning</a>, which takes a block storage device to create a pool of space that can be used to create other block devices for Docker containers and images. The device mapper backend can be configured to use direct LVM volumes or you can let Docker create a pair of loopback mounted sparse files to serve as the block devices.<br />
+  <code></code><br />
+  <em>from: <a href="http://www.projectatomic.io/blog/2015/06/notes-on-fedora-centos-and-docker-storage-drivers/">Friends Don't Let Friends Run Docker on Loopback in Production</a></em>
+</p></blockquote>
+<p>When you install Fedora on your desktop or laptop, the installer divvies your entire disk up into a small boot partition and a big LVM partition, and then divides that LVM space up into a swap volume that varies in size based on how much RAM you have installed, a root volume of 50GB, and a home volume that takes over whatever's left.</p>
+<p>https://jebpages.files.wordpress.com/2016/07/f24-default-partitioning-e1468950837698.png</p>
+<p>With no room left for the pool of space that the docker device mapper storage driver needs for containers and images, the storage driver will turn instead to crappily-performing loopback mounted files. Boo!</p>
+<h3>A Fix</h3>
+<p>You can cut back the size of the home volume in Fedora without too much trouble. I like to use system-storage-manager to work with my disks:</p>
+<p><em>NOTE: I guess I should add that whenever you're mucking with your disks, you should make sure you have backups, and so on, but I have resized my own laptop partitions in just this way on more than one occasion, and I've tested the steps written here with a VM as I wrote this, so, yeah.</em></p>
+<p>[code lang="text"]<br />
+$ sudo dnf install -y system-storage-manager<br />
+[/code]</p>
+<p>Next, reboot your machine, and when you get back to the login screen, hit CTRL-ALT-F2 to get to a virtual terminal, and then log in as root. We need to do this in order to unmount the home directory before we shrink it. As root, you can use system-storage-manager to shrink down the home volume. Below I'm shrinking the home volume to 20G, because I'm testing these instructions on a VM with a 100GB drive. Substitute a value that makes sense for your rig.</p>
+<p>[code lang="text"]<br />
+# umount /home<br />
+# ssm resize -s 20G /dev/fedora/home<br />
+# reboot<br />
+[/code]</p>
+<p>If you've already installed and run docker, you'll need to delete <code>/var/lib/docker</code>, where all of your containers and volumes live, so be prepared to rebuild those.</p>
+<p>[code lang="text"]<br />
+$ sudo systemctl stop docker<br />
+$ sudo rm -rf /var/lib/docker<br />
+$ sudo systemctl start docker<br />
+[/code]</p>
+<p>When docker starts up again, a <a href="https://github.com/projectatomic/docker-storage-setup">script that comes bundled</a> with Fedora's distribution of docker will check to see that there's space available in your volume group and will set up your storage correctly. If you want to grow your home volume later, it's easy to do and doesn't require unmounting anything. You'll run the same <code>ssm resize</code> command from above, and swap in your desired volume size.</p>
+<p><em>NOTE: If you're using docker-engine from docker.com, check out <a href="https://docs.docker.com/engine/userguide/storagedriver/device-mapper-driver/">these docs</a> for setting up devicemapper driver correctly by hand.</em></p>
+<h3>Starting out right</h3>
+<p>If you haven't yet installed Fedora, you can configure your system to accommodate this and other LVM storage scenarios moving forward by making your home volume smaller and modifying your "fedora" volume group from its default "Automatic" size policy to the "As large as possible" policy. This way, all your spare disk space will be ready for new volumes (such as the docker thin pool) or for growing your home or root volumes if you decide that you need the space later on. This is probably how Fedora partitioning should be configured by default, anyway, but it isn't.</p>
+<p>https://jebpages.files.wordpress.com/2016/07/confvg.png</p>
+<h3>Looking ahead</h3>
+<p>Finally, there's another option on the horizon for docker storage on Fedora, an option that doesn't require partition changes or planning: OverlayFS. I wrote about this in <a href="http://www.projectatomic.io/blog/2015/06/notes-on-fedora-centos-and-docker-storage-drivers/">the post</a> I linked above, too, but the TLDR is that OverlayFS and SELinux don't work together yet, although that's <a href="https://twitter.com/runc0m/status/751421625795485696">set to change</a>. Stay tuned.</p>

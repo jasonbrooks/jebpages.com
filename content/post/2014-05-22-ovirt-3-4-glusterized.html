@@ -1,0 +1,31 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- link
+date: 2014-05-22T17:04:00Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15901722477"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpcom_is_markdown: "1"
+  sharing_disabled: "1"
+published: true
+status: publish
+tags: []
+title: oVirt 3.4, Glusterized
+type: post
+url: /2014/05/22/ovirt-3-4-glusterized/
+---
+
+<blockquote>oVirt's Hosted Engine feature, introduced in the project's 3.4 release, enables the open source virtualization system to host its own management server, which means one fewer required machine, and more self-sufficiency for your oVirt installation.</p>
+<p>While a self-sufficient oVirt installation has been achievable for some time using the project's "All-in-One" method of running an oVirt virtualization host and management server together on one machine, the Hosted Engine feature allows multiple machines to partake in the hosting duties, eliminating any one host as a single point of failure.</p>
+<p>The Hosted Engine feature relies on NFS storage to house the management VM. Running an NFS server on one of our virtualization hosts would make that host a new single point of failure, which means we need either to tap an external NFS filer (the approach I took in the walkthrough I posted here recently) or we need to figure out how to make our oVirt hosts serve up their own, replicated NFS storage.</p>
+<p>In this post, I'm going to walk through that latter option – setting up a pair of CentOS 6 machines to serve as oVirt virtualization hosts that together provide the NFS storage required for the Hosted Engine feature, using Gluster for this replicated storage and for NFS and CTDB to provide a virtual IP address mount point for the storage.</p>
+</blockquote>
+<p>via <a href="http://community.redhat.com/blog/2014/05/ovirt-3-4-glusterized/">oVirt 3.4, Glusterized — Red Hat Open Source Community</a>.</p>

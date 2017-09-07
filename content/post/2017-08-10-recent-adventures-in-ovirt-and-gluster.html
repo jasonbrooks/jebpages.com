@@ -1,0 +1,70 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2017-08-10T10:34:18Z
+meta:
+  _publicize_done_12821151: "1"
+  _publicize_done_12822612: "1"
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:12817127;s:57:"https://twitter.com/jasonbrooks/status/895699865543610368";}}
+  _publicize_job_id: "8135315219"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpas_done_12817127: "1"
+  _wpas_done_12818529: "1"
+  _wpcom_is_markdown: "1"
+  publicize_google_plus_url: https://plus.google.com/+JasonBrooks0/posts/fp6sdEGpM9W
+  publicize_twitter_user: jasonbrooks
+published: true
+status: publish
+tags:
+- gluster
+- ovirt
+- storage
+- virtualization
+title: Recent Adventures in oVirt and Gluster
+type: post
+url: /2017/08/10/recent-adventures-in-ovirt-and-gluster/
+---
+
+<p>At the end of last week, I spied an <a href="https://twitter.com/SandroBonazzola/status/893498072155774977">exciting tweet</a> about oVirt:</p>
+<p><img class="alignnone size-full wp-image-7707" src="{{ site.baseurl }}/assets/libgfapi-ready.png" alt="libgfapi-ready" width="668" height="503" /></p>
+<p>Not long after I started using oVirt and Gluster together, the projects started talking about a way to <a href="https://raobharata.wordpress.com/2012/10/29/qemu-glusterfs-native-integration/">improve Gluster performance</a> by enabling virtualization hosts to access Gluster volumes directly, using Gluster's libgfapi, rather than through a FUSE-mounted location on the virtualization host. There was a little bit of fit and finish work to be done, and then we'd all be basking in the glow of ~30% better Gluster storage performance.</p>
+<p>That was about four years ago. There ended up being kind of a lot of different little things that needed fixing to make this feature work in oVirt. You can follow many of the twists and turns in <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1022961">bugzilla</a>.</p>
+<p>All along, I was eagerly awaiting the feature both as a cool new oVirt+Gluster development and as a welcome option for speeding up my own lab. Disk has always been the weakest part of my hardware setup. My servers each have a single pair of 1TB drives in mirrored RAID, shared between Gluster and the OS, and my VM's virtual drives had been stored in triplicate in replica 3 Gluster volumes. More recently, with the advent of <a href="https://gluster.readthedocs.io/en/latest/Administrator%20Guide/arbiter-volumes-and-quorum/">Gluster arbiter bricks</a>, I've been able to get the split-brain protection of replica 3 volumes with only two copies of the data, and that sped things up a bit, but did nothing to dampen my appetite for libgfapi.</p>
+<p>Since I need my oVirt setup to get things done, I usually don't test RC versions of new oVirt components there, but I couldn't wait any longer and took the plunge. I installed the RC2 updates on each of my virt hosts, and on my engine, I installed a slightly newer versionof the code, from the experimental repo, which contained a few last bits that hadn't made RC2. Then, on my engine, I ran:</p>
+<pre># engine-config -s LibgfApiSupported=true
+# systemctl restart ovirt-engine</pre>
+<p>Any VMs that were already running before the upgrade continued running without libgfapi, and if I migrated them to another host, they'd turn up on that host still using the old access method. When I restarted my VMs, they returned using libgfapi. I could tell which was which by grepping through the qemu processes on a particular VM host.</p>
+<pre># ps ax | grep qemu | grep 'file=gluster\|file=/rhev'
+
+-drive file=/rhev/data-center/00000001-0001-0001-0001-00000000025e/616be2b6-71db-4f54-befd-be6a444775d7/images/3f7877e7-e532-44a0-8735-c7b2ca06de3b/48ee34fc-ae12-494c-892f-4229fe1fef9d
+
+-drive file=gluster://10.0.20.1/data/616be2b6-71db-4f54-befd-be6a444775d7/images/6597f45a-51cd-4da5-b078-a2652baf78e4/cc3a575e-27b8-4176-b922-9466273153be
+</pre>
+<p>The qemu command lines are super long, so I cut them down just to include the line specifying the virtual drives. In the first example, the drive is being accessed through a FUSE mount, and the second, there's a direct connection to the Gluster volume.</p>
+<p>So, how was performance?</p>
+<p>I tried a few different tests, starting with running<code>dd</code>on one of my VMs:</p>
+<pre># dd bs=1M count=1024 if=/dev/zero of=test conv=fdatasync &amp;&amp; rm test</pre>
+<p>I ran this a bunch of times on a VM in both storage configurations and the libgfapi configuration came out about <strong>44% faster</strong> on average.</p>
+<p>For a more "real world" test, I figured I'd measure the time it takes to complete a common task of mine: configuring a test Kubernetes cluster from three <a href="https://getfedora.org/en/atomic/">Fedora Atomic Host</a> VMs using the <a href="https://github.com/kubernetes/contrib/tree/master/ansible">upstream ansible scripts</a>. I recorded and averaged the time it took to complete this task across multiple runs on VMs running in each storage configuration, and found that libgfapi was <strong>11% faster</strong>.</p>
+<h2>zram madness</h2>
+<p>Not too bad, but like I said earlier, my oVirt setup can use all the storage speed help it can get. My servers don't have a lot of disk but they do have quite a bit of RAM, 256GB apiece, so I've long wondered how I could use that RAM to wring more speed out of my setup. For a few months I've been experimenting with using Gluster volumes backed by RAM-disks, <a href="http://blog.gluster.org/2014/11/testing-glusterfs-with-very-fast-disks-on-fedora-20/">using zram devices</a>.</p>
+<p>This actually works pretty well, and I was seeing speeds similar to what I get running on the SSD in my laptop. Of course, RAM-disks mean losing everything on the disk in the event of a reboot (expected or otherwise), but using replica 3 Gluster volumes, I could reboot one host at a time without losing everything else. Upon bringing back the rebooted host, I'd run a little script to recreate the zram device and the mount points, and then follow the Gluster instructions for <a href="https://gluster.readthedocs.io/en/latest/Administrator%20Guide/Managing%20Volumes/#replace-brick">replacing a failed brick</a>.</p>
+<pre># cat fast.sh
+ZRAMSIZE=$((1024 * 1024 * 1024 * 50))
+modprobe zram
+echo ${ZRAMSIZE} &gt; /sys/class/block/zram0/disksize
+mkfs -t xfs /dev/zram0
+mkdir -p /gluster-bricks/fast
+mount /dev/zram0 /gluster-bricks/fast
+mkdir /gluster-bricks/fast/brick</pre>
+<p>However, if all of my machines went down at once, due to a power failure in the lab or something like that, replication wouldn't help me. I wondered if I could still get a significant boost out of a mixture of zram and regular disk backed volumes, with each of my servers hosting one zram-backed brick, one regular disk-backed brick, and one regular disk-backed arbiter brick, all combined into one distributed-replicated Gluster volume.</p>
+<p><img class="alignnone size-full wp-image-7826" src="{{ site.baseurl }}/assets/brick-house.png" alt="brick-house" width="627" height="377" /></p>
+<p>I ran my same ansible-kubernetes setup tests with the VM drives hosted from my "fast" Gluster domain, and the tests run <strong>32% faster</strong> than with the my regular disk-backed (and now libgfapi-enabled) "data" storage domain. Pretty nice, and, in this sort of setup, a power loss would mean that each of four replica groups would be missing one brick, with a remaining data brick and an arbiter brick still around to maintain the data and allow me to repair things.</p>
+<p>I want to experiment a bit further with <a href="http://blog.gluster.org/2016/03/automated-tiering-in-gluster/">automated tiering</a> in Gluster, where I'd connect a RAM-disk boosted volume like this to the volume for my main data domain, and frequently-accessed files would automatically migrate to the faster storage. As it is now, my fast domain has to be relatively small, so I have to budget my use of it.</p>

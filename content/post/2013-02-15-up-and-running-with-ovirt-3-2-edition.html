@@ -1,0 +1,53 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2013-02-15T14:05:24Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856512318"
+  _wp_old_slug: "499"
+  original_post_id: "499"
+published: true
+status: publish
+tags:
+- fedora
+- ovirt
+title: Up and Running with oVirt, 3.2 Edition
+type: post
+url: /2013/02/15/up-and-running-with-ovirt-3-2-edition/
+---
+
+<p><em><strong>I've written an updated version of this howto for oVirt 3.3 <a href="http://community.redhat.com/up-and-running-with-ovirt-3-3/">at the Red Hat Community blog</a>.</strong></em></p>
+<p>The latest version of the open source virtualization platform, oVirt, <a href="http://lists.ovirt.org/pipermail/users/2013-February/012335.html">has arrived</a>, which means it's time for the third edition of my "running oVirt on a single machine" blog post. I'm delighted to report that this ought to be the shortest (and least-updated, I hope) post of the three so far.</p>
+<p>When I wrote my first <a title="How to Get Up and Running with oVirt" href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/">"Up and Running" post</a> last year, getting oVirt running on a single machine was more of a hack than a supported configuration. Wrangling large groups of virtualization hosts is oVirt's reason for being. oVirt is designed to run with its manager component, its virtualization hosts, and its shared storage all running on separate pieces of hardware. That's how you'd want it set up for production, but a project that requires a bunch of hardware just for kicking the tires is going to find its tires un-kicked.</p>
+<p>Fortunately, this changed in August's oVirt 3.1 release, which shipped with an All-in-One installer plugin, but, as a glance at the volume of strikethrough text and UPDATE notices in my <a title="Up and Running with oVirt, 3.1 Edition" href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-1-edition/">post for that release</a>, there were more than a few bumps in the 3.1 road.</p>
+<p>In oVirt 3.2, the process has gotten much smoother, and should be as simple as setting up the oVirt repo, installing the right package, and running the install script. Also, there's now a <a href="http://resources.ovirt.org/releases/3.2/tools/">LiveCD image</a> available that you can burn onto a USB stick, boot a suitable system from, and give oVirt a try without installing anything. The downsides of the LiveCD are its size (2.1GB) and the fact that it doesn't persist. But, that second bit is one of its virtues, as well. The All in One setup I describe below is one that you can keep around for a while, if that's what you're after.</p>
+<p>Without further ado, here's how to get up and running with oVirt on a single machine:</p>
+<p>HARDWARE REQUIREMENTS: You need a machine with x86-64 processors with <a href="http://en.wikipedia.org/wiki/X86_virtualization#Hardware_assist">hardware virtualization extensions</a>. This bit is non-negotiable--the KVM hypervisor won't work without them. Your machine should have at least 4GB of RAM. Virtualization is a RAM-hungry affair, so the more memory, the better. Keep in mind that any VMs you run will need RAM of their own.</p>
+<p>It's possible to run an oVirt in a virtual machine--I've taken to testing oVirt on oVirt itself most of the time--but your virtualization host has to be set up for nested KVM for this to work. I've written a bit about <a title="oVirt on oVirt: Nested KVM Fu" href="http://blog.jebpages.com/archives/ovirt-on-ovirt-nested-kvm-fu/">running oVirt in a VM here</a>.</p>
+<p>SOFTWARE REQUIREMENTS: oVirt is developed on Fedora, and any given oVirt release tends to track the most recent Fedora release. For oVirt 3.2, this means Fedora 18. I run oVirt on minimal Fedora configurations, installed from the <a href="http://fedoraproject.org/en/get-fedora-options#formats">DVD or the netboot images</a>. With oVirt 3.1, a lot of people ran into trouble installing oVirt on the <a href="http://fedoraproject.org/en/get-fedora">default LiveCD</a> Fedora media, largely due to conflicts with NetworkManager. When I teseted 3.2 with the With 3.2, the installer script disabled NM on its own, but I had to manually enable sshd (sudo service sshd start &amp;&amp; sudo chkconfig sshd on).</p>
+<p>A lot of oVirt community members run the project on CentOS or Scientific Linux using <a href="http://wiki.dreyou.org/dokuwiki/doku.php?id=ovirt_rpm_start32">packages</a> built by <a href="http://wiki.dreyou.org/">Andrey Gordeev</a>, and official packages for these "el6" distributions are in the works from the oVirt project proper, and should be available soon for oVirt 3.2. I've run oVirt on CentOS in the past, but right now I'm using Fedora 18 for all of my oVirt machines, in order to get access to new features like the nested KVM I mentioned earlier.</p>
+<p>NETWORK REQUIREMENTS: Your test machine must have a host name that resolves properly on your network, whether you’re setting that up in a local dns server, or in the /etc/hosts file of any machine you expect to access your test machine from. If you take the hosts file editing route, the installer script will complain about the hostname--you can safely forge ahead.</p>
+<p>CONFIGURE THE REPO: Somewhat confusingly, oVirt 3.1 is already in the Fedora 18 repositories, but due to some packaging issues I'm not fully up-to-speed on, that version of oVirt is missing its web admin console. In any case, we're installing the latest, 3.2 version of oVirt, and for that we must configure our Fedora 18 system to use the oVirt project's yum repository.</p>
+<pre>sudo yum localinstall http://ovirt.org/releases/ovirt-release-fedora.noarch.rpm</pre>
+<p>SILENCING SELINUX (OPTIONAL): I typically run my systems with SELinux in enforcing mode, but it's a common source of oVirt issues. Right now, there's <del>definitely <a href="https://bugzilla.redhat.com/show_bug.cgi?id=909445">one</a></del> (now fixed), and maybe <a href="https://bugzilla.redhat.com/show_bug.cgi?id=904153">two</a> SELinux-related bugs affecting oVirt 3.2. So...</p>
+<pre>sudo setenforce 0</pre>
+<p>To make this setting persist across reboots, edit the 'SELINUX=' line in <tt> /etc/selinux/config to equal </tt>'permissive'.</p>
+<p>INSTALL THE ALL IN ONE PLUGIN: The package below will pull in everything we need to run oVirt Engine (the management server) as well as turn this management server into a virtualization host.</p>
+<pre>sudo yum install ovirt-engine-setup-plugin-allinone</pre>
+<p>RUN THE SETUP SCRIPT: Run the script below and answer all the questions. In almost every case, you can stick to the default answers. Since we're doing an All in One install, I've tacked the relevant argument onto the command below. You can run "engine-setup -h" to check out all available arguments.</p>
+<p>One of the questions the installer will ask deals with whether and which system firewall to configure. Fedora 18 now defaults to Firewalld rather than the more familiar iptables. In the handful of tests I've done with the 3.2 release code, I've had both success and failure configuring Firewalld through the installer. On one machine, throwing SELinux into permissive mode allowed the Firewalld config process to complete, and on another, that workaround didn't work.</p>
+<p>If you choose the iptables route, make sure to disable Firewalld and enable iptables before you run the install script (sudo service firewalld stop &amp;&amp; sudo chkconfig firewalld off &amp;&amp; sudo service iptables start &amp;&amp; sudo chkconfig iptables on).</p>
+<pre>sudo engine-setup --config-allinone=yes</pre>
+<p>TO THE ADMIN CONSOLE: When the engine-setup script completes, visit the web admin console at the URL for your engine machine. It will be running at port 80 (unless you’ve chosen a different setting in the setup script). Choose “Administrator Portal” and log in with the credentials you entered in the engine-setup script.</p>
+<p>From the admin portal, click the "Storage" tab and highlight the iso domain you created during the setup-script. In the pane that appears below, choose the “Data Center” tab, click “Attach,” check the box next to your local data center, and hit “OK.” Once the iso domain is finished attaching, click “Activate” to activate it.</p>
+<p>Now you have an oVirt management server that’s configured to double as a virtualization host. You have a local data domain (for storing your VM’s virtual disk images) and an NFS iso domain (for storing iso images from which to install OSes on your VMs).</p>
+<p>To get iso images into your iso domain, you can copy an image onto your ovirt-engine machine, and from the command line, run, “engine-iso-uploader upload -i iso NAME_OF_YOUR_ISO.iso” to load the image. Otherwise (and this is how I do it), you can mount the iso NFS share from wherever you like. Your images don’t go in the root of the NFS share, but in a nested set of folders that oVirt creates automatically that looks like: “/nfsmountpoint/BIG_OLE_UUID/images/11111111-1111-1111-1111-111111111111/NAME_OF_YOUR_ISO.iso. You can just drop them in there, and after a few seconds, they should register in your iso domain.</p>
+<p>Once you're up and running, you can begin installing VMs. I made the "creating VMs" screencast below for oVirt 3.1, but the process hasn't changed significantly for 3.2:</p>
+<p>[youtube:http://www.youtube.com/watch?v=C4gayV6dYK4&amp;HTML5=1]</p>

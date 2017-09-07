@@ -1,0 +1,39 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-02-22T18:45:45Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856509780"
+  _wp_old_slug: "185"
+  original_post_id: "185"
+published: true
+status: publish
+tags:
+- howto
+- opensuse
+- ovirt
+- spice
+- ubuntu
+title: Spice Spice Baby
+type: post
+url: /2012/02/22/spice-spice-baby/
+---
+
+<p>Last week, when I was getting to the "here's where you access your shiny new oVirt-hosted VM" portion of my super duper <a title="How to Get Up and Running with oVirt" href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/">Up and Running with oVirt howto</a>, I was a bit embarrassed to say that  you needed Fedora to access oVirt's console-launching automagic.</p>
+<p>oVirt uses the <a href="http://spice-space.org/">spice</a> protocol for delivering virtual desktop sessions, and while spice client packages are available for Ubuntu and for openSUSE, I wasn't able to find any up-to-date packages to provide the Firefox plugin, spice-xpi, that handles the hand off between oVirt's web admin console and the spice client application.</p>
+<p>So, I grabbed the source RPM for the Fedora spice-xpi package and headed off to the openSUSE Build Service and to the Ubuntu Personal Package Archives to build some packages. Now, I'm close to being a packaging n00b -- historically, <a href="http://asic-linux.com.mx/~izto/checkinstall/">checkinstall</a> has been the extent of my packaging efforts -- but, I got the packages built and they work, at least on the 64-bit versions of <a href="https://launchpad.net/~jasonbrooks/+archive/ppa">Ubuntu 11.10</a> and <a href="https://build.opensuse.org/package/show?package=spice-xpi&amp;project=home%3Ajasonbrooks">openSUSE 12.1</a> with which I tested. I built x86 versions, too, but haven't tested them yet.</p>
+<p>Here's a shot of the spice-xpi package doing its thing on Ubuntu 11.10:</p>
+<p><a href="https://launchpad.net/~jasonbrooks/+archive/ppa"><img class="aligncenter size-full wp-image-187" title="oneiric-spice" src="{{ site.baseurl }}/assets/oneiric-spice.png" alt="" width="401" height="360" /></a></p>
+<p>And here's a shot of the spice-xpi package in action on openSUSE 12.1:</p>
+<p><a href="https://build.opensuse.org/package/show?package=spice-xpi&amp;project=home%3Ajasonbrooks"><img class="aligncenter size-full wp-image-188" title="opensuse-spice" src="{{ site.baseurl }}/assets/opensuse-spice.png" alt="" width="400" height="350" /></a></p>
+<p>So, if you were all set to test drive oVirt, but drew the line at fleeing your client distro of choice to access your VMs (and if your distro of choice happens to be Ubuntu or openSUSE) go forth and get to your oVirt tire-kicking. And if you check out the packages and have feedback that'll help me be a better Ubuntu and openSUSE packager, I'd appreciate it if you'd share.</p>
+<p>Also, I have at least one more soon-to-come VM access blog post in me, dealing with VM access from Windows (and maybe not dealing, but wondering aloud, at least, about access from OS X).</p>
+<p>Finally, I want to put in a plug for an oVirt Workshop that the project is holding in Beijing, China, on March 21. If you're Beijing-based, and you're interested in learning more about oVirt, check out the <a href="http://www.ovirt.org/news-and-events/workshop/">oVirt Project site</a> for more information, and please spread the word.</p>
+<p>&nbsp;</p>

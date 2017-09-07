@@ -1,0 +1,36 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2011-05-17T11:50:54Z
+meta:
+  _publicize_job_id: "15853829548"
+  _wp_old_slug: "4165"
+  original_post_id: "4165"
+published: true
+status: publish
+tags:
+- FE
+title: New Horizons for Mono, and for Silverlight
+type: post
+url: /2011/05/17/new-horizons-for-mono-and-for-silverlight/
+---
+
+<p>[caption id="attachment_4169" align="alignright" width="180" caption="Xamarin, FTW"]<a href="http://www.xamarin.com/"><img class="size-full wp-image-4169" title="Xamarin, FTW" src="{{ site.baseurl }}/assets/larrymoon.png" alt="" width="180" height="176" /></a>[/caption]</p>
+<p>I've just returned from Atlanta, where <a title="follow Cameron Sturdevant on Twitter" href="http://www.twitter.com/csturdevant" target="_blank">Cameron</a> and I attended a Microsoft Server and Tools reviewer workshop packed with cool product presentations, such as those for Microsoft's <a href="http://www.microsoft.com/windowsazure/">Windows Azure</a> cloud computing services, and for the <a href="http://www.microsoft.com/visualstudio/en-us/lightswitch/">LightSwitch </a><a title="DIY App Dev" href="http://eweeklabs.files.wordpress.com/2011/05/larrymoon.pngarchives/the_app_dev_diy_story">non-developer</a> development platform.</p>
+<p>However, I found my my enthusiasm for Azure and for LightSwitch somewhat stunted upon finding that neither the Azure admin console nor the apps built with LightSwitch will work with my Ubuntu computers.<!--more--> Both products rely on Microsoft's <a href="http://www.microsoft.com/silverlight/faq/">Silverlight</a>, a rich Internet application framework that supports Windows, OS X on the desktop, with a mobile edition that works with Windows Phone 7 and Symbian OS.</p>
+<p>Obviously, Microsoft gets to select which platforms to support, and Linux isn't the most broadly-adopted client OS out there, but Silverlight's most direct rival, Flash, works just fine with Linux, HTML works great. Hey, even Angry Birds now runs on Linux via HTML5, a trick that required Windows fakery via WINE until recently.</p>
+<p>Now, there is a promising path to getting Silverlight working on my computer without resorting to any such fakery: Moonlight, part of the Mono project that provides an open source implementation of Microsoft's .NET framework. For now, though, there are two roadblocks in this path:</p>
+<p><em>Problem One</em>: While Microsoft quite courteously forwards Linux-based browsers from its own Get Silverlight page to a Get Moonlight page with 32 and 64-bit Firefox and Chrome extensions for the plugin, Moonlight (as with the rest of Mono) is always in catch-up mode with Silverlight and .Net, and, as a result, has never worked reliably for me.</p>
+<p>LightSwitch and the Azure admin console does depend on Silverlight 4, and the current stable version of Moonlight targets Silverlight 2. The current beta version of Moonlight, version 3.99, does target Silverlight 4, but when I tried to access the Microsoft products from the reviewer workshop, both teased me with a spinning "app loading" icon before dumping me off into a blank page.</p>
+<p><em>Problem Two:</em> Mono was part of Novell until, in the wake of Novell's acquisition by the Attachmate Group, the Mono team was cut loose (you can't really kill an open source project) and left to fend for itself.</p>
+<p>Fortunately for Mono, Moonlight, and the prospect of me ever running Silverlight-based applications on my Linux computer, the project's founder, <a href="http://tirania.org/blog/archive/2011/May-16.html" target="_blank">Miguel de Icaza announced </a>yesterday that his Mono team would carry on in the form of a <a href="http://www.eweek.com/c/a/Application-Development/Mono-Project-Founder-Launches-New-Company-Xamarin-861032/" target="_blank">new startup, Xamarin</a>. I hope that one of Xamarin's first new customers will be Microsoft, through  an engagement to make Linux a first-class platform for the Azure admin  console and the LightSwitch runtime via Moonlight.</p>
+<p>Yes, Linux is a much smaller-share platform than Windows or OS X, but Linux is big enough to  pay attention to--something that Microsoft definitely "gets," as evidenced by the excellent cross platform support built into Exchange 2010's Outlook Web Access, and the slate of Office 2010 Web Apps.</p>
+<p>What's more, an effort to bring the development-oriented Azure and LightSwitch to an open source operating system fits well with Microsoft's ongoing effort to garner good will  among developers, implementors and users of open source software.</p>
+<p>If Microsoft were to retain Xamarin to bring Moonlight and Mono closer to parity with Silverlight and .Net, it would address my problems one and two, and would go a long way toward fleshing out Microsoft's mixed source in harmony message.</p>
+<p>&nbsp;</p>

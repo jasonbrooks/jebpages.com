@@ -1,0 +1,88 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2017-03-30T19:53:55Z
+meta:
+  _publicize_done_12821151: "1"
+  _publicize_done_12822612: "1"
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:12817127;s:57:"https://twitter.com/jasonbrooks/status/847643125757558785";}}
+  _publicize_job_id: "3465902166"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpas_done_12817127: "1"
+  _wpas_done_12818529: "1"
+  _wpcom_is_markdown: "1"
+  publicize_google_plus_url: https://plus.google.com/+JasonBrooks0/posts/KhvMtRaRidx
+  publicize_twitter_user: jasonbrooks
+published: true
+status: publish
+tags:
+- docker
+- fedora
+- kubernetes
+- middleman
+- openshift origin
+title: getting stuff done with a local openshift origin instance
+type: post
+url: /2017/03/30/getting-stuff-done-with-a-local-openshift-origin-instance/
+---
+
+<p>A <a href="https://github.com/oVirt/ovirt-site">few of</a> <a href="https://github.com/projectatomic/atomic-site">the projects</a> <a href="https://github.com/gluster/glusterweb">I work with</a> use static websites based on <a href="https://middlemanapp.com/">middleman</a>, which you can run locally to see how your edits, or those of others, will look on the live site when they're merged.</p>
+<p>Each of these sites defaults to port 4567 when running locally, so if I'm running more than one of them at a time, they complain that their favored port is already taken. It's easy enough to fire up middleman on a different port, but I thought I'd try and run a couple of these in containers, using a local instance of <a href="https://www.openshift.org/">OpenShift Origin</a>, a <a href="https://kubernetes.io/">Kubernetes</a>-based container application platform.</p>
+<p>It's pretty easy to get up and running with an OpenShift Origin instance using the command <a href="https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md"><code>oc cluster up</code></a>. The oc client is available for Linux, Windows and Mac OS. Since containers (pretty much) <em>are Linux</em>, you'll need a Linux VM on Mac or Windows, but the oc client can use docker machine to take care of that for you. I haven't tested that, though, because I use Linux already.</p>
+<p>On Fedora, I followed <a href="https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md#linux">these instructions</a>, with the exception of installing the oc client from the Fedora repos (<code>dnf install -y origin-clients</code>), rather than downloading the binary from GitHub.</p>
+<p>I wanted my origin install to persist across restarts, so I created a folder in my home directory to store persistent data, and started up my instance with:</p>
+<p>[code lang=text]<br />
+$ sudo oc cluster up --host-data-dir=/home/jbrooks/origin-data --use-existing-config<br />
+[/code]</p>
+<p><code>sudo</code> was necessary because I haven't set up my regular user account to <a href="http://www.projectatomic.io/blog/2015/08/why-we-dont-let-non-root-users-run-docker-in-centos-fedora-or-rhel/">run docker without it</a> -- not a big deal, but some config files for logging in to my origin instance as admin ended up in my <code>/root</code> directory instead of my home directory, so I copied those over:</p>
+<p>[code lang=text]<br />
+$ sudo cp -r /root/.kube ~/.<br />
+$ sudo chown -R jbrooks:jbrooks ~/.kube<br />
+[/code]</p>
+<p>I logged into the OpenShift web console using the URL and the developer:developer user name and password output by the <code>oc cluster up</code> command, clicked "Add to Project", and then, under the "Languages" heading, chose "Ruby," and then "Ruby 2.3", because middleman is a ruby affair.</p>
+<p>https://jebpages.files.wordpress.com/2017/03/oso-middleman1.png</p>
+<p>I filled in a name, pasted in the git repository URL for the ovirt middleman site, and hit "Create."</p>
+<p>https://jebpages.files.wordpress.com/2017/03/oso-middleman2.png</p>
+<p>I headed to the "Overview" page, saw that my build was running, clicked "View Log," and saw that a familiar-looking build process was chugging along.</p>
+<p>https://jebpages.files.wordpress.com/2017/03/oso-middleman3.png</p>
+<p>When the build finished, OpenShift kicked off a deployment of my image, which I could see from the deployment log linked from the overview page, was erroring out.</p>
+<p>After some poking around, I fixed the issue by heading to the deployments section of the web console and, after first pausing the deployment, hitting the edit YAML button. I used the YAML editor to add a command right in between the image and ports sections of the configuration.</p>
+<p>https://jebpages.files.wordpress.com/2017/03/oso-middleman6.png</p>
+<p>I also changed the containerPort from a default of 8080 to the middleman default of 4567. I expected this change to filter down to the service and route that were automatically created for me, but they didn't -- it wasn't tough to edit those via the web console, however.</p>
+<p>I added <code>GIT_COMMITTER_NAME</code> and <code>GIT_COMMITTER_EMAIL</code> environment variables to my deployment, from an "Environment" tab in the deployments area of the console. As I eventually learned, git got grumpy about running as a random UID (as is OpenShift's security-conscious custom) rather than as a "real" user with an entry in <code>/etc/passwd</code>, but adding those ENV variables calmed git down.</p>
+<p>Once I had a pod up and running, I was able to view the development site in my web browser via the URL provided in the routes section of the console.</p>
+<p>Next, I headed to my terminal to log into my running pod with OpenShift's <code>oc rsh</code> command, and fetch and check out a pending pull request on the ovirt site:</p>
+<p>[code lang=text]<br />
+$ oc rsh ovirt-site-2-4-50eao</p>
+<p>$ git fetch origin pull/877/head:pr-ovirt-gluster-411</p>
+<p>$ git checkout pr-ovirt-gluster-411<br />
+[/code]</p>
+<p>The middleman development server handles live reloading, so once I checked out the new branch, it refreshed, and I could see my awaiting-merge blog post:</p>
+<p>https://jebpages.files.wordpress.com/2017/03/oso-middleman5.png</p>
+<p>This works, but I'll probably hone the process some more from here. I experimented a bit with using <a href="http://kompose.io/">kompose</a> to put together a simple docker compose-formatted manifest for my app that could either pull from an openshift-built or a built-elsewhere docker container. Like this:</p>
+<p>[code lang=text]<br />
+version: &quot;2&quot;</p>
+<p>services:<br />
+  ovirt-site:<br />
+    image: 172.30.24.24:5000/myproject/ovirt-site<br />
+    ports:<br />
+      - &quot;4567&quot;<br />
+    environment:<br />
+      - GIT_COMMITTER_NAME=&quot;Jason Brooks&quot;<br />
+      - GIT_COMMITTER_EMAIL=&quot;jbrooks@redhat.com&quot;<br />
+    entrypoint:<br />
+      - scl<br />
+      - enable<br />
+      - rh-ruby23<br />
+      - /opt/app-root/src/run-server.sh<br />
+    labels:<br />
+      kompose.service.type: NodePort<br />
+[/code]</p>
+<p>I think that that approach would then work for a regular kube cluster or, with some tweaking, probably, docker or docker swarm as well.</p>

@@ -1,0 +1,168 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2016-08-15T12:32:50Z
+meta:
+  _oembed_1c00d69902038ea9d261241902c74889: '{{unknown}}'
+  _oembed_03aed8276551c00149265d0cf2477f08: '{{unknown}}'
+  _oembed_8aa1812a29eb5fbbaa80fc0d1d7433f3: '{{unknown}}'
+  _oembed_9a39091384ef7ad07a09f09b9439446d: '{{unknown}}'
+  _oembed_21a192f311f9ef50430ea20ccf4c00c0: '{{unknown}}'
+  _oembed_4449ea0a56d59992f39ec6d62e675cc2: '{{unknown}}'
+  _oembed_25349b596955814137346d30dd355e52: '{{unknown}}'
+  _oembed_26977bbd83085ab6f6a03e55dfcdbcfd: '{{unknown}}'
+  _oembed_5341277f26e20152c30193f5bf1034ed: '{{unknown}}'
+  _oembed_b9d253822d802d0965fb17516b7df485: '{{unknown}}'
+  _oembed_d48242050a600fa210a8267b0523d4f1: '{{unknown}}'
+  _oembed_dca380d6420ec5fb474e397ff0c06252: '{{unknown}}'
+  _oembed_ddc02e693418d5f70260ffad5ea6008e: '{{unknown}}'
+  _oembed_e7a047a10dc93c74b52b342d780017f4: '{{unknown}}'
+  _publicize_done_12821151: "1"
+  _publicize_done_12822612: "1"
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:12817127;s:57:"https://twitter.com/jasonbrooks/status/765270080368156672";}}
+  _publicize_job_id: "25817161363"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpas_done_12817127: "1"
+  _wpas_done_12818529: "1"
+  _wpcom_is_markdown: "1"
+  publicize_google_plus_url: https://plus.google.com/+JasonBrooks0/posts/in6VFB66LZ7
+  publicize_twitter_user: jasonbrooks
+published: true
+status: publish
+tags:
+- atomic
+- centos
+- docker
+- fedora
+- kubernetes
+title: running kubernetes in containers on atomic
+type: post
+url: /2016/08/15/running-kubernetes-in-containers-on-atomic/
+---
+
+<p>The <a href="http://www.projectatomic.io/docs/introduction/">atomic hosts</a> from CentOS and Fedora earn their "atomic" namesake by providing for atomic, image-based system updates via rpm-ostree, and atomic, image-based application updates via docker containers.</p>
+<p>This "system" vs "application" division isn't set in stone, however. There's room for system components to move across from the <a href="http://www.projectatomic.io/blog/2016/07/hacking-and-extending-atomic-host/">somewhat</a> rigid world of ostree commits to the freer-flowing container side.</p>
+<p>In particular, the key atomic host components involved in orchestrating containers across multiple hosts, such as flannel, etcd and kubernetes, could run instead in containers, making life simpler for those looking to test out newer or different versions of these components, or to swap them out for alternatives.</p>
+<p><a href="https://twitter.com/surajd_">Suraj Deshmukh</a> wrote a post recently about <a href="https://deshmukhsuraj.wordpress.com/2016/07/19/hybrid-setup-for-multi-node-kubernetes/">running kubernetes in containers</a>. He wanted to test kubernetes 1.3, for which Fedora packages aren't yet available, so he turned to the upstream <a href="https://github.com/kubernetes/kubernetes.github.io/blob/master/docs/getting-started-guides/docker-multinode/master.md">kubernetes-on-docker</a>.</p>
+<p>Suraj ran into trouble with flannel and etcd, so he ran those from installed rpms. Flannel can be tricky to run as a docker container, because docker's own configs must be modified to use flannel, so there's a bit of a chicken-and-egg situation.</p>
+<p>One solution is <a href="http://www.scrivano.org/2016/03/24/system-containers-for-atomic/">system containers for atomic</a>, which can be run independently from the docker daemon. <a href="https://twitter.com/gscrivano">Giuseppe Scrivano</a> has built example containers <a href="https://hub.docker.com/r/gscrivano/flannel/">for flannel</a> and <a href="https://hub.docker.com/r/gscrivano/etcd/">for etcd</a>, and in this post, I'm describing how to use these system containers alongside a containerized kubernetes on an atomic host.</p>
+<h3>setting up flannel and etcd</h3>
+<p>You need a very recent version of the <code>atomic</code> command. I used a pair of CentOS Atomic Hosts running the <a href="https://wiki.centos.org/SpecialInterestGroup/Atomic/Devel">"continuous"</a> stream.</p>
+<p>The master host needs etcd and flannel:</p>
+<p>[code lang=text]<br />
+# atomic pull gscrivano/etcd</p>
+<p># atomic pull gscrivano/flannel</p>
+<p># atomic install --system gscrivano/etcd<br />
+[/code]</p>
+<p>With etcd running, we can use it to configure flannel:</p>
+<p>[code lang=text]<br />
+# export MASTER_IP=YOUR-MASTER-IP</p>
+<p># runc exec gscrivano-etcd etcdctl set /atomic.io/network/config &#039;{&quot;Network&quot;:&quot;172.17.0.0/16&quot;}&#039;</p>
+<p># atomic install --name=flannel --set FLANNELD_ETCD_ENDPOINTS=http://$MASTER_IP:2379 --system gscrivano/flannel<br />
+[/code]</p>
+<p>The worker node needs flannel as well:</p>
+<p>[code lang=text]<br />
+# export MASTER_IP=YOUR-MASTER-IP</p>
+<p># atomic pull gscrivano/flannel</p>
+<p># atomic install --name=flannel --set ETCD_ENDPOINTS=http://$MASTER_IP:2379 --system gscrivano/flannel<br />
+[/code]</p>
+<p>On both the master and the worker, we need to make docker use flannel:</p>
+<p>[code lang=text]<br />
+# echo &quot;/usr/libexec/flannel/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker&quot; | runc exec flannel bash<br />
+[/code]</p>
+<p>Also on both hosts, we need this docker tweak (<a href="https://github.com/kubernetes/kubernetes/issues/4869">because of this</a>):</p>
+<p>[code lang=text]<br />
+# cp /usr/lib/systemd/system/docker.service /etc/systemd/system/</p>
+<p># sed -i s/MountFlags=slave/MountFlags=/g /etc/systemd/system/docker.service</p>
+<p># systemctl daemon-reload</p>
+<p># systemctl restart docker<br />
+[/code]</p>
+<p>On both hosts, some context tweaks to make SELinux happy:</p>
+<p>[code lang=text]<br />
+# mkdir -p /var/lib/kubelet/</p>
+<p># chcon -R -t svirt_sandbox_file_t /var/lib/kubelet/</p>
+<p># chcon -R -t svirt_sandbox_file_t /var/lib/docker/<br />
+[/code]</p>
+<h3>setting up kube</h3>
+<p>With flannel and etcd running in system containers, and with docker configured properly, we can start up kubernetes in containers. I've pulled the following docker run commands from the <a href="https://github.com/kubernetes/kube-deploy/tree/master/docker-multinode">docker-multinode</a> scripts in the kubernetes project's kube-deploy repository.</p>
+<p>On the master:</p>
+<p>[code lang=text]<br />
+# docker run -d \<br />
+--net=host \<br />
+--pid=host \<br />
+--privileged \<br />
+--restart=&quot;unless-stopped&quot; \<br />
+--name kube_kubelet_$(date | md5sum | cut -c-5) \<br />
+-v /sys:/sys:rw \<br />
+-v /var/run:/var/run:rw \<br />
+-v /run:/run:rw \<br />
+-v /var/lib/docker:/var/lib/docker:rw \<br />
+-v /var/lib/kubelet:/var/lib/kubelet:shared \<br />
+-v /var/log/containers:/var/log/containers:rw \<br />
+gcr.io/google_containers/hyperkube-amd64:$(curl -sSL &quot;https://storage.googleapis.com/kubernetes-release/release/stable.txt&quot;) \<br />
+/hyperkube kubelet \<br />
+--allow-privileged \<br />
+--api-servers=http://localhost:8080 \<br />
+--config=/etc/kubernetes/manifests-multi \<br />
+--cluster-dns=10.0.0.10 \<br />
+--cluster-domain=cluster.local \<br />
+--hostname-override=${MASTER_IP} \<br />
+--v=2<br />
+[/code]</p>
+<p>On the worker:</p>
+<p>[code lang=text]<br />
+# export WORKER_IP=YOUR-WORKER-IP</p>
+<p># docker run -d \<br />
+--net=host \<br />
+--pid=host \<br />
+--privileged \<br />
+--restart=&quot;unless-stopped&quot; \<br />
+--name kube_kubelet_$(date | md5sum | cut -c-5) \<br />
+-v /sys:/sys:rw \<br />
+-v /var/run:/var/run:rw \<br />
+-v /run:/run:rw \<br />
+-v /var/lib/docker:/var/lib/docker:rw \<br />
+-v /var/lib/kubelet:/var/lib/kubelet:shared \<br />
+-v /var/log/containers:/var/log/containers:rw \<br />
+gcr.io/google_containers/hyperkube-amd64:$(curl -sSL &quot;https://storage.googleapis.com/kubernetes-release/release/stable.txt&quot;) \<br />
+/hyperkube kubelet \<br />
+--allow-privileged \<br />
+--api-servers=http://${MASTER_IP}:8080 \<br />
+--cluster-dns=10.0.0.10 \<br />
+--cluster-domain=cluster.local \<br />
+--hostname-override=${WORKER_IP} \<br />
+--v=2</p>
+<p># docker run -d \<br />
+--net=host \<br />
+--privileged \<br />
+--name kube_proxy_$(date | md5sum | cut -c-5) \<br />
+--restart=&quot;unless-stopped&quot; \<br />
+gcr.io/google_containers/hyperkube-amd64:$(curl -sSL &quot;https://storage.googleapis.com/kubernetes-release/release/stable.txt&quot;) \<br />
+/hyperkube proxy \<br />
+--master=http://${MASTER_IP}:8080 \<br />
+--v=2<br />
+[/code]</p>
+<h3>get current kubectl</h3>
+<p>I usually test things out from the master node, so I'll download the newest stable kubectl binary to there:</p>
+<p>[code lang=text]<br />
+# curl -sSL https://storage.googleapis.com/kubernetes-release/release/$(curl -sSL &quot;https://storage.googleapis.com/kubernetes-release/release/stable.txt&quot;)/bin/linux/amd64/kubectl &gt; /usr/local/bin/kubectl</p>
+<p># chmod +x /usr/local/bin/kubectl<br />
+[/code]</p>
+<h3>test it</h3>
+<p>It takes a few minutes for all the containers to get up and running. Once they are, you can start running kubernetes apps. I typically test with the <a href="https://github.com/projectatomic/nulecule-library/tree/master/guestbookgo-atomicapp">guestbookgo atomicapp</a>:</p>
+<p>[code lang=text]<br />
+# atomic run projectatomic/guestbookgo-atomicapp<br />
+[/code]</p>
+<p>Wait a few minutes, until <code>kubectl get pods</code> tells you that your guestbook and redis pods are running, and then:</p>
+<p>[code lang=text]<br />
+# kubectl describe service guestbook | grep NodePort<br />
+[/code]</p>
+<p>Visiting the <code>NodePort</code> returned above at either my master or worker IP (these kube scripts configure both to serve as workers) gives me this:</p>
+<p>https://jebpages.files.wordpress.com/2016/08/guestbook-ftw.png</p>

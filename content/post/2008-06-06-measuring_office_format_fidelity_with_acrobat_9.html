@@ -1,0 +1,57 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2008-06-06T12:29:06Z
+excerpt: |
+  When considering alternatives to Microsoft's Office productivity suite, one of the most important issues to evaluate is that of the success with which Office rivals such as OpenOffice.org can handle Microsoft's ubiquitous binary file formats.
+
+  While the phrase "small formatting inconsistencies" sums up the situation fairly accurately, organizations and individuals out to bring the open-source suite into their application mix could use a more rigorous means of measuring OpenOffice.org's handling of MS Office formats.
+
+  That's why, when Adobe briefed me on Acrobat 9, I was particularly interested in Acrobat's new "compare documents" feature, which analyzes two PDF documents and parses out all of the inconsistencies between them...
+meta:
+  _publicize_job_id: "15853826133"
+  _wp_old_slug: "2040"
+  original_post_id: "2040"
+published: true
+status: publish
+tags:
+- FE
+title: Measuring Office Format Fidelity with Acrobat 9
+type: post
+url: /2008/06/06/measuring_office_format_fidelity_with_acrobat_9/
+---
+
+<p>When considering alternatives to Microsoft's Office productivity suite, one of the most important issues to evaluate is that of the success with which Office rivals such as OpenOffice.org can handle Microsoft's ubiquitous binary file formats.</p>
+<p><a href="http://www.eweek.com/c/a/Enterprise-Apps/Measuring-Office-Format-Compatibility-with-Acrobat-9/"><img alt="acrobat2.jpg" src="{{ site.baseurl }}/assets/acrobat2.jpg" width="350" height="248" align="right" /></a>
+<p>
+Over the past few years, eWEEK Labs has approached the MS Office to OpenOffice.org file format fidelity issue several times. Our conclusions haven't changed much since 2004, when <a href="http://www.eweek.com/cp/bio/Anne-Chen/">Anne Chen</a> and I helped one of our corporate partners <a href="http://www.eweek.com/c/a/Enterprise-Apps/Office-2003-vs-OpenOfficeOrg/2/">test the productivity suite pair</a> for themselves:</p>
+<blockquote><p>"Although OpenOffice.org does a good job of handling Microsoft Office file formats, small formatting inconsistencies will require reworking of complex documents."</p></blockquote>
+<p>
+While the phrase "small formatting inconsistencies" still sums up the situation fairly accurately, organizations and individuals out to bring the open source suite into their application mix could use a more rigorous means of measuring OpenOffice.org's handling of MS Office formats.</p>
+<p>
+That's why, when Adobe briefed me on Acrobat 9, I was particularly interested in Acrobat's new "compare documents" feature, which analyzes two PDF documents and parses out all of the inconsistencies between them.</p>
+<p>
+I grabbed a Word-formatted reviewer's guide document <a href="http://www.google.com/search?q=site%3Amicrosoft.com+filetype%3Adoc">from Microsoft's Web site</a>, opened it up in Word 2007, and printed it to a PDF using Acrobat 9.</p>
+<p>
+Next, I opened the document in OpenOffice.org 2.4 and used Acrobat 9 to print it to a PDF document. I could have used OpenOffice.org's built-in PDF export function, or Office 2007's plugin-based PDF exporter, but I opted to stick with Acrobat in order to minimize inconsistencies that the differing PDF exporters might have introduced.</p>
+<p>
+I fired up Acrobat 9 (I tested with a beta version of the software) and pointed the application's compare document feature at my Office and OpenOffice.org-rendered PDF documents. The result? Good fidelity overall, but various inconsistencies remained. This time, however, I had Acrobat 9 on hand to point the inconsistencies out to me.</p>
+<p>
+For instance, right on the first page of the document, OpenOffice.org rendered a 935 by 227 pixel logo at 936 by 234 pixels--a formatting inconsistency that resulted in a slightly misplaced logo, but one that I would have had a tough time putting my finger on without Acrobat 9's help.</p>
+<p>
+Another odd, slight inconsistency came in the document's table of contents, in which OpenOffice.org rendered 146 periods between the section name and page number, where Office had rendered 145 periods.</p>
+<p>
+I also downloaded a test version of the upcoming OpenOffice.org version 3, and compared that version's Word document rendering to that of OpenOffice.org 2.4. Both versions appeared to render my test Word document exactly the same--a result that Acrobat's compare function confirmed.</p>
+<p>
+Since support for Microsoft's new Office Open XML formats is one of the new features in OpenOffice.org 3.0, I fetched another document from Microsoft's Web site, this time in the DOCX format, and cheffed up some PDFs to gauge the open-source suite's OOXML chops. This time, the formatting differences were much more pronounced and included misplaced images and jumbled bullet lists.</p>
+<p>
+I expect to see OpenOffice.org 3.0 improve its handling of OOXML documents as it moves closer to its release. I'll be testing the suite's OOXML capabilities as subsequent test releases emerge, and I expect that I'll be using Acrobat 9 to help with those tests.</p>
+<p>
+For a walkthrough of my Acrobat-fueled Office vs. OpenOffice.org file format adventures, see our slide show, <a href="http://www.eweek.com/c/a/Enterprise-Apps/Measuring-Office-Format-Compatibility-with-Acrobat-9/">here</a>.</p>
+<p /></p></p></p></p></p></p></p>

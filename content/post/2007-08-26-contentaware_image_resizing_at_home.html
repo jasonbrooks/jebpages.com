@@ -1,0 +1,54 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2007-08-26T18:22:52Z
+excerpt: |-
+  Last week I came across a video presentation of Ariel Shamir and Shai Avidan's "Seam Carving for Content-Aware Image Resizing," a method for resizing images by slicing out or padding uninteresting strips of pixels.
+
+  If you've seen this video already, you may be a bit bummed-out that you can't access an application right now that'll work this magic. However, at least one enterprising developer has already implemented this and released his initial code, and I can report that his app works pretty well...
+meta:
+  _publicize_job_id: "15853824288"
+  _wp_old_slug: "1999"
+  original_post_id: "1999"
+published: true
+status: publish
+tags:
+- FE
+title: Content-Aware Image Resizing at Home
+type: post
+url: /2007/08/26/contentaware_image_resizing_at_home/
+---
+
+<p>Last week I came across a video presentation of <a href="http://www.faculty.idc.ac.il/arik/">Ariel Shamir</a> and Shai Avidan's "Seam Carving for Content-Aware Image Resizing," a method for resizing images by slicing out or padding uninteresting strips of pixels.</p>
+<p>
+If you haven't seen this <a href="http://www.youtube.com/watch?v=vIFCV2spKtg">presentation on YouTube</a> already, watch it here right now. I'll wait.</p>
+<p>
+[youtube http://www.youtube.com/watch?v=6NcIJXTlugc]</p>
+<p>
+OK. Wasn't that sweet?</p>
+<p>
+Personally, I'd love to use the method for stretching out photos I've taken in portrait orientation to fill my desktop wallpaper properly. When I watched this video, I was wishing that this resizing effect was available as a <a href="http://www.gimp.org/">Gimp plug-in</a>, or in some other form in which I could easily access it.</p>
+<p>
+Then, yesterday, the Content-Aware Image Resizing video <a href="http://science.slashdot.org/article.pl?sid=07/08/25/1835256">turned up on Slashdot</a>, along with some very interesting reader comments. Two different commenters claimed to have implemented the resizing method themselves, and they both provided links to their source code.</p>
+<p>
+I headed over to <a href="http://www.ultra-premium.com/b/photos/resize.html">the blog site</a> of one of these commenters, an Australian programmer named Andy Owen, downloaded his code (which Andy released under the GPL3), and compiled it. The code worked pretty well.</p>
+<p>
+I tried this out on a picture I took of the Golden Gate Bridge, which first I scaled down to 640 pixels across (to save time) and then converted to BMP (to comply with Andy's app).</p>
+<p>
+<img alt="fullsize.jpg" src="{{ site.baseurl }}/assets/fullsize.jpg" width="640" height="453" /></p>
+<p>
+Owen's app only downsizes, and it only accepts 24-bit BMP files as input. What's more, the app goes one horizontal pixel strip at a time, so I had to chef up a shell script to run the app a bunch of times in a row to achieve a noticeable result.</p>
+<p>
+I Content-Awarefully Resized my picture to 437 pixels across. The picture came out looking pretty good, although the suspension cables of the bridge picked up some artifacts.</p>
+<p>
+<img alt="resized.jpg" src="{{ site.baseurl }}/assets/resized.jpg" width="437" height="453" /></p>
+<p>
+Another Slashdot commenter said that he knows a grad student of one of the presenters, and that the method <a href="http://science.slashdot.org/comments.pl?sid=279819&amp;cid=20357709">was developed as a Gimp plugin</a> initially, but that the project switched to a Windows-based application to pull off the live resizing you see in the video.</p>
+<p>
+Given this alleged background for the plug-in, and the quick implementation work of Andy Owen -- and perhaps others -- maybe I'll soon have this functionality for my image manipulator of choice after all.</p></p></p></p></p></p></p></p>

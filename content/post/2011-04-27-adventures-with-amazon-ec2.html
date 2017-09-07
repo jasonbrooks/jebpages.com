@@ -1,0 +1,33 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2011-04-27T21:52:41Z
+meta:
+  _publicize_job_id: "15853829330"
+  _wp_old_slug: "3768"
+  original_post_id: "3768"
+published: true
+status: publish
+tags:
+- FE
+title: Adventures with Amazon EC2
+type: post
+url: /2011/04/27/adventures-with-amazon-ec2/
+---
+
+<p><img class="alignright size-full wp-image-3769" title="melty" src="{{ site.baseurl }}/assets/melty1.png" alt="" width="220" height="194" />This week we re-launched labs.eweek.com to serve as a home base eWEEK Labs team, and as a place to test out some of the products and services we cover in more "real world" setting than what we get within the confines of our San Francisco lab.</p>
+<p>To that end, we've set up shop in the cloud. We intend to move around among cloud services from time to time, but, as with so many of the products we encounter, we've begun our cloudy adventures at Amazon's EC2 service.<!--more--></p>
+<p>I spun up a fresh copy of Wordpress 3.1 atop Ubuntu 10.04, created a child theme based on that project's default, Twenty Ten theme, and imported all pointers to our reviews and analysis pieces from eWEEK.com, as well as the past few years of blog posts from our assorted Labs blogs.</p>
+<p>Over at AWS, I opted for the service's smallest instance size, t1.micro, figuring that if and when we melted our server with overuse, the experience would be educational. After a few quick tests with the open source load testing tool <a href="http://www.joedog.org/index/siege-home">siege</a>, I could tell that it wouldn't take a whole lot to overmatch the t1.micro instance type, so I took a few steps to buttress the site.</p>
+<p>I installed <a href="http://wordpress.org/extend/plugins/wp-super-cache/">WP Super Cache</a> to conserve resources by serving up mostly static pages. With the caching in place, my test server stood up much better under the same test load. I also offloaded commenting functions to Disqus--which I've had my eye on for a while, anyhow, as a way to integrate Twitter streams with site comments. And, because looked pretty easy to set up, I hooked the site up to Amazon's Cloudfront CDN to serve up static content like images, css and javascript files.</p>
+<p>I thought we might get along OK for a while with this configuration, but the first big test would come on newsletter day, when a significant number of visitors would hit the site within a small window. Wednesday morning, when those newsletter visitors starting hitting the site, it didn't take long for our shiny new Wordpress site to crash.</p>
+<p>When the site stopped responding, I stopped the instance at Amazon and started it back up at a larger size. I hadn't set up my computer at home with the EC2 API tools, but they're available in the Ubuntu repositories, so it was easy to take care of that. <a href="http://twitter.com/esh">Eric Hammond</a> has a <a href="http://alestic.com/2011/02/ec2-change-type">great howto</a> on embiggening EC2.</p>
+<p>I ratcheted the instance up to a c1.medium size, and associated the larger instance with the site's elastic IP address, which took care of the outage, and then set about figuring out how to ratchet it back down. I'd been prepared for our site to have trouble with the micro instance size, but expected it to fare better than it did.</p>
+<p>I turned next to our server logs and noticed that our newsletter included a broken link (something I should have caught earlier), which was leading to a lot of 404 error. The WP Super Cache plugin doesn't cache 404s by default, but I figured out how to configure it to do so. We'll see what effect the more expansive caching policy has for the site. I'm sure there are plenty of tweaks we'll have to make along the way--before packing up the site and trying something new.</p>
+<p>Looking ahead, I'm interested figuring out how much more of the site could be served from S3--Amazon CTO <a href="http://www.twitter.com/werner">Werner Vogels</a> runs <a href="http://www.allthingsdistributed.com/2011/02/website_amazon_s3.html">his blog</a> entirely from S3.</p>

@@ -1,0 +1,47 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-08-30T12:50:38Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856511829"
+  _wp_old_slug: "390"
+  original_post_id: "390"
+  sharing_disabled: "1"
+published: true
+status: publish
+tags:
+- centos
+- fedora
+- ovirt
+title: Too Fast, Too Slow
+type: post
+url: /2012/08/30/too-fast-too-slow/
+---
+
+<p>Yesterday I removed Fedora 17 from the server I use for oVirt testing, mainly, because I've been experiencing <a href="http://ask.fedoraproject.org/question/2253/fedora-17-random-reboots-where-to-begin">random reboots</a> on the server, and I haven't been able to figure out why. I'm pretty sure I wasn't having these issues on Fedora 16, but I can't go back to that release because the official packages for oVirt are built only for F17. There are, however, <a href="http://wiki.dreyou.org/dokuwiki/doku.php/ovirt_rpm_start31">oVirt packages built for Enterprise Linux</a> (aka RHEL and its children), and I know that some in the oVirt community have been running with these packages with success.</p>
+<p>So, I figured I'd install CentOS 6 on my machine and either escape my random reboots or, if the reboots continued, learn that there's probably something wrong with my hardware. Plus, I'd escape a <a href="https://bugzilla.redhat.com/show_bug.cgi?id=845660">second bug</a> I've been experiencing with Fedora 17, the one in which a recent rebase to the Linux 3.5 kernel (F17 shipped originally with a 3.3 kernel) seems to have broken oVirt's ability to access NFS shares, thereby breaking oVirt.</p>
+<p>Installing oVirt 3.1 on CentOS 6 went very smoothly -- the steps involved were <a title="Up and Running with oVirt, 3.1 Edition" href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-1-edition/">pretty much the same</a> as those for Fedora. Before I knew it, I was back up and running with a CentOS-based oVirt 3.1 rig just like my F17 one, complete with my F17 test server template and my F17 VMs for my in-progress gluster/ovirt integration writeup, all repatriated from my oVirt export domain.</p>
+<p>However... all is not well.</p>
+<p>My Fedora 17 VMs aren't running normally on my new CentOS 6 host, and what I'm seeing reminds me of <a href="https://bugzilla.redhat.com/show_bug.cgi?id=837925">a bug I encountered</a> several weeks ago when I first upgraded from oVirt 3.0 to the oVirt 3.1 beta. The solution came in the form of a bugfix from the qemu project upstream -- that's a real benefit of running a leading edge distro like Fedora -- when issues are fixed upstream, you don't have to wait forever for them to float along to you.</p>
+<p>Also, the closer you are to upstream, the faster you get access to new features. Not long after updating my qemu to address the F16/F17 VM booting issue, I took to running qemu packages even closer to upstream, from the <a href="http://fedoraproject.org/wiki/Virtualization_Preview_Repository">Fedora Virtualization Preview repository</a>. The oVirt 3.1 management engine supports live snapshots, but requires at least qemu 1.1, which is slated for Fedora 18.</p>
+<p>Of course, the downside of tracking the leading edge is that with frequent changes come frequent opportunities for breakage. The changes that don't directly address your pain points are pure downside, like the NFS-disabling kernel rebase I mentioned earlier. Too fast versus too slow.</p>
+<p>So what now?</p>
+<p>I wasn't experiencing these random reboots on my other F17 system -- my Thinkpad X220, which I've pressed into service as a second oVirt node. I have this F17-based node hooked up to my el6 oVirt engine, and if I set my Fedora VMs to launch only on this node, they run just fine. This machine has only 8GB of RAM, though, and that limits how many VMs I can run on it. Also, since my F17 and el6 nodes are running different versions of qemu, live migration between them doesn't work.</p>
+<ul>
+<li>I could shift my in-progress ovirt/gluster testing to el6, VMs of which run just fine with the older qemu, but I'd prefer to keep testing with Fedora, and the newest code.</li>
+<li>I could, instead of hitting the brakes and running el6 on my test server, hit the gas and throw F18 on there. Maybe that'd solve my random reboot issue, though I'm not sure if my disabled NFS travails would follow me forward.</li>
+<li>I could figure out how to rebuild the new qemu packages on el6. I've started down this path already, but rpmbuild is voicing some complaints that seem related to systemd, which F17 uses and el6 does not.</li>
+<li>I could find out that my random reboot problems weren't the fault of F17 after all, which would send me poring over my hardware and possibly returning to F17.</li>
+</ul>
+<p>For now, I'm going to play some more with updating my qemu on el6, while squeezing my F17 VMs into my smaller F17-based node to get this ovirt/gluster howto finished.</p>
+<p>Then maybe I'll take a long walk on the beach and meditate on the merits of too slow versus too fast in Linux distros, and ponder whether the Giants will sweep the Astros tonight.</p>
+<p><strong>Update:</strong> I was able to rebuild Fedora <a href="http://koji.fedoraproject.org/koji/buildinfo?buildID=344871">qemu 1.1 packages</a> for CentOS. I commented out some systemd-dependent stuff from the spec file. I had to rebuild a couple of other packages, too, which I found in Fedora's <a href="http://koji.fedoraproject.org/koji/">buildsystem</a>. Now, my Fedora 17 VMs run well on my CentOS 6 oVirt host (which hasn't randomly rebooted yet), and I can migrate VMs between it and my F17-based node.</p>
+<p>And the Giants won, too.</p>
+<p>&nbsp;</p>

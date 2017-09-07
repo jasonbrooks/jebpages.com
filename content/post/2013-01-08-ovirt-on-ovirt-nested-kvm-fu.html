@@ -1,0 +1,46 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2013-01-08T17:39:38Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856512207"
+  _wp_old_slug: "470"
+  original_post_id: "470"
+published: true
+status: publish
+tags:
+- KVM
+- ovirt
+- vdsm
+title: 'oVirt on oVirt: Nested KVM Fu'
+type: post
+url: /2013/01/08/ovirt-on-ovirt-nested-kvm-fu/
+---
+
+<p>I'm a big fan of virtualization -- the ability to take a server and slice it up into a bunch of virtual machines makes life trying out and writing about software much, much easier than it'd be in a one instance per server world.</p>
+<p>Things get tricky, however, when the software you want to try out is itself intended for hosting virtual machines. These days, all of the virtualization work I do centers around the KVM hypervisor, which relies on <a href="http://en.wikipedia.org/wiki/X86_virtualization#Hardware_assist">hardware extensions</a> to do its thing.</p>
+<p>Over the past year or so, I've dabbled in Nested Virtualization with KVM, in which the KVM hypervisor passes its hardware-assisted prowess on to guest instances to enable those guest to host VMs of their own. When I first dabbled in this, ten or so months ago, my nested virtualization only sort-of worked -- my VMs proved unstable, and I shelved further investigation for a while.</p>
+<p>Recently, though, nested KVM has been working pretty well for me, both on my notebook and on some of the much larger machines in our lab. In fact, with the help of a new feature  slated for oVirt 3.2, I've taken to testing whole oVirt installs, complete with live migration between hosts, all within a single host oVirt machine. Pretty sweet, since oVirt forms both my main testing platform and one of the primary projects I look to test.</p>
+<p>All my tests with nested KVM have been with Intel hardware, because that's what I have in my labs, but it's my understanding that nested KVM works with AMD processors as well, and that the feature is actually more mature on that gear.</p>
+<p>To join in on the nested fun, you must first check to see if nested KVM support is enabled on your machine by running:</p>
+<pre>cat /sys/module/kvm_intel/parameters/nested</pre>
+<p>If the answer is "N," you can enable it by running:</p>
+<pre>echo "options kvm-intel nested=1" &gt; /etc/modprobe.d/kvm-intel.conf</pre>
+<p>After adding that kvm-intel.conf file, reboot your machine, after which "cat /sys/module/kvm_intel/parameters/nested" should return "Y."</p>
+<p>I've used nested KVM with virt-manager, the libvirt front-end that ships with most Linux distributions, including my own distro of choice, Fedora. With virt-manager, I configure the VM I want to use as a hypervisor-within-a-hypervisor by clicking on the "Processor" item in the VM details view, and clicking the "Copy host configuration" button to ensure that my guest instance boots with the same set of CPU features offered by my host processor. For good measure, I expand the "CPU Features" menu list and ensure that the feature "vmx" is set to "require."</p>
+<p><img class="aligncenter size-full wp-image-471" alt="virt-manager-nested" src="{{ site.baseurl }}/assets/virt-manager-nested.png" width="500" height="425" /></p>
+<p>Not too taxing, but it turns out that with oVirt, enabling nested virtualization in guests is even easier, thanks to <a href="https://access.redhat.com/knowledge/docs/en-US/Red_Hat_Enterprise_Virtualization/3.1/html-single/Administration_Guide/index.html#appe-VDSM_and_Hooks">VDSM hooks</a>. VDSM hooks are scripts executed on the host when key events occur. The version of VDSM that will accompany oVirt 3.2 includes a <a href="http://gerrit.ovirt.org/gitweb?p=vdsm.git;a=blob_plain;f=vdsm_hooks/nestedvt/before_vm_start.py;hb=HEAD">nestedvt hook</a> that does exactly what I described above -- it runs a check for nested KVM support, and if that support is found, it adds the require vmx element to your VM's definition.</p>
+<p>I've tested this both with oVirt 3.2 alpha, and with the current, oVirt 3.1 version. In the latter case, I simply installed the vdsm-hook-nestedvt package from oVirt's nightly repository, and it worked fine with the current stable version of vdsm.</p>
+<p><img class="aligncenter size-full wp-image-472" alt="ovirtonovirt" src="{{ site.baseurl }}/assets/ovirtonovirt.png" width="500" height="370" /></p>
+<p>I mentioned above that I've been able to test oVirt on oVirt in this way, and performance hasn't been remarkably bad, but I wanted to get a better handle on the performance hit of nesting. I settled, unscientifically, on running mock builds of the ovirt-engine source package, a real life task that involves CPU and I/O work.</p>
+<p>I ran the build operation four times on a VM running under oVirt, and four times on a VM running under an oVirt instance which was itself running under oVirt. I outfitted both the nested and the non-nested VM with 4GB of RAM and two virtual cores. I was using the same physical machine for both VMs, but I ran the tests one at a time, rather than in .parallel.</p>
+<p>The four builds on the "real" VM averaged out to 14 minutes, 15 seconds, and the build quartet on the nested VM averaged 28 minutes, 18 seconds. So, I recorded a definite performance hit with the nested virtualization, but not a big enough hit to dissuade me from further nested KVM exploration.</p>
+<p>Speaking of further exploration, I'm looking very forward to attending the next oVirt Workshop later this month, which will take place at NetApp's Sunnyvale campus from Jan 22-24.</p>
+<p>If you're in the Bay Area and you'd like to learn more about oVirt, I'd love to see you there. The event is free of charge (much like oVirt itself) and all the agenda and registration details are available on the oVirt project site at <a href="http://www.ovirt.org/NetApp_Workshop_January_2013">http://www.ovirt.org/NetApp_Workshop_January_2013</a>. Registration closes on Jan 15th, so get on it!</p>

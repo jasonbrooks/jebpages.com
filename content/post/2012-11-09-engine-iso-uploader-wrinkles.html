@@ -1,0 +1,31 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-11-09T10:32:03Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856512080"
+  _wp_old_slug: "449"
+  original_post_id: "449"
+published: true
+status: publish
+tags:
+- ovirt
+title: engine-iso-uploader wrinkles
+type: post
+url: /2012/11/09/engine-iso-uploader-wrinkles/
+---
+
+<p>I've been installing oVirt 3.1 on some shiny new lab equipment, and I came across a pair of interesting snags with engine-iso-uploader, a tool you can use to upload iso images to your oVirt installation.</p>
+<p>I installed the tool on a F17 client machine and festooned the command with the many arguments required to send an iso image off through the network to the iso domain of my oVirt rig. The command failed with the message, "ERROR:root:mount.nfs: Connection timed out."</p>
+<p>I had an idea what might be wrong. The iso domain I set up is hosted by Gluster, and exposed via Gluster's built-in NFS server, which only supports NFSv3. Fedora 17 is set by default to require NFSv4, and when I changed /etc/nfsmount.conf to make Nfsvers=3, I got around that NFS error -- only to hit another, weirder error: "ERROR: A user named vdsm with a UID and GID of 36 must be defined on the system to mount the ISO storage domain on iso1 as Read/Write."</p>
+<p>Vdsm is the daemon that runs oVirt virtualization hosts, so vdsm needs to be able to read and write to the storage domains. I was surprised, though, that the client machine I was using to upload an iso had to have its own vdsm user to do the job. Anyway, I created the vdsm user with the 36.36 IDs, and the command worked.</p>
+<p>Engine-iso-uploader does its business with NFS by default, but there's another option to upload via ssh, which, I imagine, would avoid the need for that vdsm user. I gave it a quick try, hit a new error, ERROR: Error message is "unable to test the available space on /iso1", and shelved further messing around w/ the tool, for now.</p>
+<p>My favored method for getting iso images into my iso domain remains mounting the NFS share and dropping them in there. What I'd really like to see is a way to do this straight from the oVirt web admin console.</p>
+<p>&nbsp;</p>

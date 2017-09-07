@@ -1,0 +1,70 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-10-11T08:51:41Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856512013"
+  _wp_old_slug: "419"
+  original_post_id: "419"
+published: true
+status: publish
+tags:
+- android
+- gluster
+- google compute engine
+- iOS
+- openstack
+- rackspace
+- swift
+title: A Buzzword-Packed Return to Gluster UFO
+type: post
+url: /2012/10/11/a-buzzword-packed-return-to-gluster-ufo/
+---
+
+<p>A little while back, I <a title="Fedora 17, OpenStack Essex &amp; Gluster 3.3: All Smushed Together" href="http://blog.jebpages.com/archives/fedora-17-openstack-and-gluster-3-3/">tested out</a> the Unified File and Object feature in Gluster 3.3, which taps <a href="http://www.gluster.org/2012/09/howto-using-ufo-swift-a-quick-and-dirty-setup-guide/">OpenStack's Swift</a> component to handle the object half of the file and object combo. It took me kind of a long time to get it all running, so I was pleased to find this blog post promising a <a href="http://www.gluster.org/2012/09/howto-using-ufo-swift-a-quick-and-dirty-setup-guide/">Quick and Dirty guide to UFO setup</a>, and made a mental note to return to UFO.</p>
+<p>When my colleague <a href="https://twitter.com/johnmark">John Mark</a> asked me about this<a href="http://www.rackspace.com/cloud/mobile/"> iOS Swift client from Rackspace</a>, I figured that now would be a good time to revisit UFO, and do it on one of the <a href="https://cloud.google.com/products/compute-engine">Google Compute Engine</a> instances available to me while I'm in my free trial period with the newest member of Google's cloud computing family. (OpenStack, iOS &amp; Cloud: Feel the Search Engine Optimization!)</p>
+<p><strong>That Quick and Dirty Guide</strong></p>
+<p>The UFO guide, written by <a href="http://www.gluster.org/author/kkeithley/">Kaleb Keithley</a>, worked just as quickly as advertised: start with Fedora 16, 17 or RHEL 6 (or one of the RHEL 6 rebuilds) and end with a simple Gluster install that abides by the OpenStack Swift API. I installed on CentOS 6 because this, along with Ubuntu, is what's supported right now in Google Compute engine.</p>
+<p>Kaleb notes at the bottom of his post that you might experience authentication issues with RHEL 6--I didn't have this problem, but I did have to add in the extra step of starting the memcache service manually (service memcached start) before starting up the swift service (swift-init main start).</p>
+<p>The guide directs you to configure a repository that contains the up-to-date Gluster packages needed. I'm familiar with this repository, as it's the same one I use on my F17 and CentOS 6 oVirt test systems. I also had to <a href="http://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F">configure the EPEL repository</a> on my CentOS 6 instance, as UFO requires some packages not available in the regular CentOS repositories.</p>
+<p>I diverged from the guide in one other place. Where the guide asks you to add this line to the  [filter:tempauth] section of /etc/swift/proxy-server.conf:</p>
+<pre>user_$myvolname_$username=$password .admin</pre>
+<p>I found that I had to tack on an extra URL to that line to make the iOS client work:</p>
+<pre>user_$myvolname_$username=$password .admin https://$myhostname:443/v1/AUTH_$myvolname</pre>
+<p>Without the extra URL, my UFO setup was pointing the iOS client to a 127.0.0.1 address, which, not surprisingly, the iOS device wasn't able to access.</p>
+<p><strong>The iOS Client (and the Android non-client)</strong></p>
+<p>Rackspace's Cloud Mobile application enables users of the company's Cloud Servers and Cloud Files offering to access these services from iOS and Android devices. I tried out both platforms, the former on my iPod Touch (recently upgraded to iOS 6) and on my Nexus S 4G smartphone (which runs a nightly build of <a href="http://www.cyanogenmod.com/">Cyanogenmod 10</a>).</p>
+<p>My subhead above says Android non-client, because, as <a href="https://play.google.com/store/apps/details?id=com.rackspace.cloud.android&amp;reviewId=02215783627511792451">reviewers in the Google Play store</a> and the developer in this <a href="https://github.com/rackspace/android-rackspacecloud/issues/20">github issue comment</a> both indicate (but the app description and [non-existent] docs do not), the current version of the Android client doesn't work with the recent, Swift-based incarnation of Rackspace's cloud Files service.</p>
+<p>What's more, the Android version of the client does not allow any modification of one's account settings. When I was trial-and-erroring my way toward figuring out the right account syntax, this got pretty annoying. Also annoying was the absence of any detailed error messages.</p>
+<p>Things were better (albeit still undocumented) with the iOS version of the client, which allowed for account details editing, for ignoring invalid ssl certs, and for viewing the error message returned by any failed API operations.</p>
+<p>In the parlance of the above Gluster UFO setup guide, here are the correct values for the account creation screen (the one you reach in the iOS client after selecting "Other" on the Provider screen:</p>
+<ul>
+<li>Username:    $myvolname:$username</li>
+<li>API Key:    $password</li>
+<li>Name:   $whateveryouwant</li>
+<li>API Url:    https://$myhostname:443/auth/v1.0</li>
+<li>Validate SSL Certificate:   OFF</li>
+</ul>
+<div><img class="aligncenter size-full wp-image-425" title="swift-ios" src="{{ site.baseurl }}/assets/swift-ios.png" alt="" width="500" height="374" /></div>
+<div>After getting those account details in place, you'll be able to view the Swift/Gluster containers accessible to your account, create new containers, and upload/download files to and from those containers. There were no options for managing permisisons through the iOS client, so when I wanted to <a href="http://docs.openstack.org/api/openstack-object-storage/1.0/content/special-metadata-acls.html">make a container world-readable</a>, I did it from a terminal, using the API.</div>
+<div></div>
+<div><img class="aligncenter size-full wp-image-427" title="swift-ios1" src="{{ site.baseurl }}/assets/swift-ios1.png" alt="" width="500" height="375" /></div>
+<p><strong>Google Compute Engine</strong></p>
+<p>As I mentioned above, I tested this on <a href="https://developers.google.com/compute/">Google Compute Engine</a>, the Infrastructure-as-a-Service offering that the search giant announced at its last Google I/O conference. I excitedly signed up for the GCE limited preview as soon as it was announced, but for various reasons, I haven't done as much testing with it as I'd planned.</p>
+<p>Here are my bullet-point impressions of GCE:</p>
+<ul>
+<li><em>CentOS or Ubuntu</em> -- On GCE, for now, you run the instance types they give you, and that's either CentOS 6 or Ubuntu 10.04. You can create your own images, by modifying one of the stock images and going through <a href="https://developers.google.com/compute/docs/images?hl=en#installinganimage">a little process</a> to export and save it. This comes in handy, because, for now, on GCE, there are...</li>
+<li><em>No persistent instances</em> -- It's like the earlier days of Amazon EC2. Your VMs lose all their changes when they terminate. There is, however...</li>
+<li><em>Persistent storage available</em> -- You can't store VMs in persistent images, but you can hook up your VMs to virtual disks that persist, for storing data.</li>
+<li><em>No SELinux</em> -- The CentOS images come with SELinux disabled. This turned out to be annoying for me, as OpenShift Origin and oVirt both expect to find SELinux enabled. This cut short a pair of my tests. I was able to modify the oVirt Engine startup script not to complain about SELinux, but was then foiled due to...</li>
+<li><em>Monolithic kernel (no module loading)</em> -- oVirt engine, which I'd planned to test with a Gluster-only cluster (real virt wouldn't have worked atop the already-virtualized GCE), wanted to load modules, and there's no module-loading allowed (for now) on GCE. All told, though...</li>
+<li><em>GCE is a lot like EC2</em> -- With a bit of familiarity with the ways of EC2, you should feel right at home on GCE. I opened firewall ports for access to port 443 and port 22 using security groups functionality that's much like what you have on EC2. You launch instances in a similar way, with Web or command line options, and so on.</li>
+</ul>
+<p>&nbsp;</p>

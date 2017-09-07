@@ -1,0 +1,74 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-08-31T13:19:46Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856511931"
+  _wp_old_slug: "403"
+  original_post_id: "403"
+published: true
+status: publish
+tags:
+- fedora
+- gluster
+- ovirt
+- storage
+- virtualization
+title: oVirt 3.1, Glusterized
+type: post
+url: /2012/08/31/ovirt-3-1-glusterized/
+---
+
+<p>One of the cooler new features in oVirt 3.1 is the platform's support for creating and managing Gluster volumes. oVirt's web admin console now includes a graphical tool for configuring these volumes, and vdsm, the service for responsible for controlling oVirt's virtualization nodes, has a new sibling, vdsm-gluster, for handling the back end work.</p>
+<p>Gluster and oVirt make a good team -- the scale out, open source storage project provides a nice way of weaving the local storage on individual compute nodes into shared storage resources.</p>
+<p>To demonstrate the basics of using oVirt's new Gluster functionality, I'm going to take the <a title="Up and Running with oVirt, 3.1 Edition" href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-1-edition/">all-in-one engine/node oVirt rig</a> that I stepped through recently and convert it from an all-on-one node with local storage, to a multi-node ready configuration with shared storage provided by Gluster volumes that tap the local storage available on each of the nodes. <em>(Thanks to Robert Middleswarth, whose <a href="http://middleswarth.net/content/installing-ovirt-31-and-glusterfs-using-either-nfs-or-posix-native-file-system">blog posts on oVirt and Gluster</a> I relied on while learning about the combo.)</em></p>
+<p>The all-in-one installer leaves you with a single machine that hosts both the oVirt management server, aka ovirt-engine, and a virtualization node. For storage, the all-in-one setup uses a local directory for the data domain, and an NFS share on the single machine to host an iso domain, where OS install images are stored.</p>
+<p>We'll start the all-in-one to multi-node conversion by putting our local virtualization host, local_host, into maintenance mode by clicking the Hosts tab in the web admin console, clicking the local_host entry, and choosing "Maintenance" from the Hosts navigation bar.</p>
+<p>Once local_host is in maintenance mode, we click edit, change to the Default data center and host cluster from the drop down menus in the dialog box, and then hit OK to save the change.</p>
+<p><img class="aligncenter size-full wp-image-404" title="ovirt-gluster1" src="{{ site.baseurl }}/assets/ovirt-gluster1.png" alt="" width="400" height="314" /></p>
+<p>This is assuming that you stuck with NFS as the default storage type while running through the engine-setup script. If not, head over to the Data Centers tab and edit the Default data center to set "NFS" as its type. Next, head to the Clusters tab, edit your Default cluster, fill the check box next to "Enable Gluster Service," and hit OK to save your changes. Then, go back to the Hosts tab, highlight your host, and click Activate to bring it back from maintenance mode.</p>
+<p>Now head to a terminal window on your engine machine. Fedora 17, the OS I'm using for this walkthrough, includes version 3.2 of Gluster. The oVirt/Gluster integration requires Gluster 3.3, so we need to configure a separate repository to get the newer packages:</p>
+<pre># cd /etc/yum.repos.d/
+# wget http://repos.fedorapeople.org/repos/kkeithle/glusterfs/fedora-glusterfs.repo</pre>
+<p>Next, install the vdsm-gluster package, restart the vdsm service, and start up the gluster service:</p>
+<pre># yum install vdsm-gluster
+# service vdsmd restart
+# service glusterd start</pre>
+<p>The all-in-one installer configures an NFS share to host oVirt's iso domain. We're going to be exposing our Gluster volume via NFS, and since the kernel NFS server and Gluster's NFS server don't play well nicely together, we have to disable the former server.</p>
+<pre># systemctl stop nfs-server.service &amp;&amp; systemctl disable nfs-server.service</pre>
+<p>Through much trial and error, I found that it was also necessary to restart the wdmd service:</p>
+<pre># systemctl restart wdmd.service</pre>
+<p>In the move from v3.0 to v3.1, oVirt dropped its NFSv3-only limitation, but that requirement remains for Gluster, so we have to edit /etc/nfsmount.conf and ensure that Defaultvers=3, Nfsvers=3, and Defaultproto=tcp.</p>
+<p>Next, edit /etc/sysconfig/iptables to add the firewall rules that Gluster requires. You can paste the rules in just before the reject lines in your config.</p>
+<pre># glusterfs
+-A INPUT -p tcp -m multiport --dport 24007:24047 -j ACCEPT
+-A INPUT -p tcp --dport 111 -j ACCEPT
+-A INPUT -p udp --dport 111 -j ACCEPT
+-A INPUT -p tcp -m multiport --dport 38465:38467 -j ACCEPT</pre>
+<p>Then restart iptables:</p>
+<pre># service iptables restart</pre>
+<p>Next, decide where you want to store your gluster volumes -- I store mine under /data -- and create this directory if need be:</p>
+<pre># mkdir /data</pre>
+<p>Now, head back to the oVirt web admin console, visit the Volumes tab, and click Create Volume. Give your new volume a name, and choose a volume type from the drop down menu. For our first volume, let's choose Distribute, and then click the Add Bricks button. Add a single brick to the new volume by typing the path you desire into the the Brick Directory field, clicking Add, and then OK to save the changes.</p>
+<p><img class="aligncenter size-full wp-image-405" title="ovirt-gluster2" src="{{ site.baseurl }}/assets/ovirt-gluster2.png" alt="" width="500" height="338" /></p>
+<p>Make sure that the box next to NFS is checked under Access Protocols, and then click OK. You should see your new volume listed -- highlight it and click Start to start it up. Follow the same steps to create a second volume, which we'll use for a new ISO domain.</p>
+<p>For now, the Gluster volume manager neglects to set brick directory permissions correctly, so after adding bricks on a machine, you have to return to the terminal and run chown -R 36.36 /data (assuming /data is where you are storing your volume bricks) to enable oVirt to write to the volumes.</p>
+<p>Once you've set your permissions, return to the Storage tab of the web admin console to add data and iso domains at the volumes we've created. Click New Domain, choose Default data center from the data center drop down, and Data / NFS from the storage type drop down. Fill the export path field with your engine's host name and the volume name from the Gluster volume you created for the data domain. For instance: "demo1.localdomain:/data"</p>
+<p>Wait for data domain to become active, and repeat the above process for the iso domain. For more information on setting up storage domains in oVirt 3.1, see the <a href="http://wiki.ovirt.org/wiki/Quick_Start_Guide#Configure_Storage">quick start guide</a>.</p>
+<p>Once the iso domain comes up, BAM, you're Glusterized. Now, compared to the default all-in-one install, things aren't too different yet -- you have one machine with everything packed into it. The difference is that your oVirt rig is ready to take on new nodes, which will be able to access the NFS-exposed data and iso domains, as well as contribute some of their own local storage into the pool.</p>
+<p>To check this out, you'll need a second test machine, with Fedora 17 installed (though you can recreate all of this on CentOS or another Enterprise Linux starting with the <a href="http://wiki.dreyou.org/dokuwiki/doku.php/ovirt_rpm_start31">packages here</a>). Take your F17 host (I start with a minimal install), install the <a href="http://www.ovirt.org/releases/ovirt-release-fedora-4-2.noarch.rpm">oVirt release package</a>, download the same fedora-glusterfs.repo we used above, and make sure your new host is accessible on the network from your engine machine, and vice versa. Also, <a href="https://bugzilla.redhat.com/show_bug.cgi?id=845660">the bug preventing F17 machines running a 3.5 or higher kernel from attaching to NFS domains</a> isn't fixed yet, so make sure you're running a 3.3 or 3.4 version of the kernel.</p>
+<p>Head over to the Hosts tab on your web admin console, click New, supply the requested information, and click OK. Your engine will reach out to your new F17 machine, and whip it into a new virtualization host. (For more info on adding hosts, again, see the <a href="http://wiki.ovirt.org/wiki/Quick_Start_Guide#Attach_Fedora_Host">quick start guide</a>.)</p>
+<p>Your new host will require most of the same Glusterizing setup steps that you applied to your engine server: make sure that vdsm-gluster is installed, edit /etc/nfsmount.conf, add the gluster-specific iptables rules and restart iptables, create and chown 36.36 your data directory.</p>
+<p>The new host should see your Gluster-backed storage domains, and you should be able to run VMs on both hosts and migrate them back and forth. To take the next step and press local storage on your new node into service, the steps are pretty similar to those we used to create our first Gluster volumes.</p>
+<p>First, though, we have to run the command "gluster peer probe NEW_HOST_HOSTNAME" from the engine server to get the engine and it's new buddy hooked up Glusterwise (this another of the wrinkles I hope to see ironed out soon, taken care automatically in the background).</p>
+<p>We can create a new Gluster volume, data1, of the type Replicate. This volume type requires at least two bricks, and we'll create one in the /data directory of our engine, and one in the /data directory of our node. This works just the same as with the first Gluster volume we set up, just make sure that when adding bricks, you select the correct server in the drop down menu:</p>
+<p><img class="aligncenter size-full wp-image-406" title="ovirt-gluster3" src="{{ site.baseurl }}/assets/ovirt-gluster3.png" alt="" width="500" height="289" /></p>
+<p>Just as before, we have to return to the command line to chown -R 36.36 /data on both of our machines to set the permissions correctly, and start the volumes we've created.</p>
+<p>On my test setup, I created a second data domain, named data1, stored on the replicated Gluster domain, with the storage path set to localhost:/data1, on the rationale that VM images stored on the data1 domain would stay in sync across the pair of hosts, enabling either of my hosts to tap local storage for running a particular VM image. But I'm a newcomer to Gluster, so <a href="http://www.gluster.org/community/documentation/index.php/Main_Page">consult the documentation</a> for more clueful Gluster guidance.</p>

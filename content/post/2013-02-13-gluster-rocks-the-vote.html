@@ -1,0 +1,37 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2013-02-13T14:00:07Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856512279"
+  _wp_old_slug: "489"
+  original_post_id: "489"
+published: true
+status: publish
+tags:
+- gluster
+- user story
+title: Gluster Rocks the Vote
+type: post
+url: /2013/02/13/gluster-rocks-the-vote/
+---
+
+<p><a href="http://www.rockthevote.com/about/">Rock the Vote</a> needed a way to manage the fast growth of the data handled by its Web-based voter registration application. The organization turned to GlusterFS replicated volumes to allow for filesystem size upgrades on its virtualized hosting infrastructure without incurring downtime.</p>
+<p>Over its twenty-one year history, Rock the Vote has registered more than five million young people to vote, and has become a trusted source of information about registering to vote and casting a ballot.</p>
+<p><img class="alignright  wp-image-490" alt="rtv" src="{{ site.baseurl }}/assets/rtv.png" width="280" height="233" /></p>
+<p>Since 2009, Rock the Vote has run a Web-based voter registration application, powered by an open source rails application stack called <a href="https://github.com/trustthevote/Rocky">Rocky</a>.</p>
+<p>I talked to <a href="http://osuosl.org/about/people">Lance Albertson</a>, Associate Director of Operations at the Oregon State University Open Source Lab and primary technical systems operation lead for the service, about how they're using Gluster to provide for the service's growing storage requirements.</p>
+<p>"During a non-election season," Albertson explained, "the filesystem use and growth is minimal, however during a presidential election season, the growth of the filesystem can be exponential. So with Gluster we're trying to solve the sudden growth problem we have."</p>
+<p>Rock the Vote's voter registration application is served from a virtual machine instance running Gentoo Hardened, with a pair of physical servers running CentOS 6 with Gluster 3.3.0 to host voter registration form data. The storage nodes host a replicated GlusterFS volume, which the registration front end accesses via Gluster's NFS mount support.</p>
+<p>The Gluster-backed iteration of the voter registration application started out in September with a 100GB volume, which the team stepped up incrementally to 350GB as usage grew in the period leading up to the election.</p>
+<p>Before implementing Gluster for their storage needs, Rock the Vote's application hosting team was using local storage within their virtual machines to store the voter form data, which made it difficult to expand storage without bringing their VMs down to do so.</p>
+<p>The hosting team shifted storage to an HA NFS cluster, but found the implementation fragile and prone to breakage when adding/removing NFS volumes and shares.</p>
+<p>"Gluster allowed us more flexibility in how we manage that storage without downtime," Albertson continued, "Gluster made it easy to add a volume and grow it as we needed."</p>
+<p>Looking ahead to future election seasons, and forthcoming GlusterFS releases, Albertson told me that the Gluster attribute he's most interested in is limited-downtime upgrades between version 3.3.0 and future Gluster releases. Albertson is also looking forward to the addition of multi-master support in Gluster's geo-replication capability, an enhancement planned for the upcoming 3.4 version.</p>

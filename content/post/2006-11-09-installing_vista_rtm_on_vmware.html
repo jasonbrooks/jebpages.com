@@ -1,0 +1,34 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2006-11-09T13:44:00Z
+meta:
+  _publicize_job_id: "15853822284"
+  _wp_old_slug: "1945"
+  original_post_id: "1945"
+published: true
+status: publish
+tags:
+- FE
+title: Installing Vista RTM on VMware
+type: post
+url: /2006/11/09/installing_vista_rtm_on_vmware/
+---
+
+<p>During our recent Vista tests, we came across a bug in the Vista installer that prevented us from installing the OS onto VMware using an iso image of Vista.&nbsp; The OS booted normally for us from an iso image, but then complained about not having a driver for the virtual DVD/CD drive from which we'd just booted.</p>
+<p>The error message that Vista coughs up is, "A required CD/DVD device driver is missing.&nbsp; If you have a driver floppy disk, CD, DVD or USB flash drive, please insert it now."</p>
+<p>Here's a workaround, which we pieced together from a handful of VMware web forum posts, and tested with the RTM Vista release and VMware Server 1.0.1.</p>
+<p>Steps to get Vista installed on VMware Server using an ISO image:</p>
+<p>1. Configure your Vista VM with two CD drives, the first pointed at a real CD drive, the second pointed at the Vista iso image.&nbsp; Configure both drives to "connect at power on," and make sure the "legacy emulation" box is not checked for your first CD drive.</p>
+<p>2. Boot up your Vista VM with no disc in the physical drive. Your VM will boot from the Vista iso image.</p>
+<p>3. Once your VM boots, click "Next," and then "Install Vista." When you hit an error about Vista not having a driver for your CD drive, alt-ctrl out of the VM and go to "VM," "Removable Devices," "CDROM 1,"&nbsp; in the VMware Server console menu and edit CDROM 1 to point at your Vista iso image. You don't need to change CDROM 2.</p>
+<p>4. Click OK, and Vista should proceed normally.</p>
+<p>I've only tested this so far with VMware Server, but I imagine the procedure will be the same for other VMware products.</p>
+<p>UPDATE: Once I got Vista installed this way, the system still wasn't recognizing my CD drives.&nbsp; I switched my first drive back to point at a physical CD drive with legacy emulation switched off, rebooted Vista, waited for the OS to recognize and install a driver for the drive.&nbsp; Once the system had installed a driver for that first CD drive, I was able to point it at the iso image on which the VMware tools are stored and install those tools, which I had to do in order for Vista to recognize my virtual NIC.</p>
+<p>After rebooting, however, Vista still did not recognize my iso-backed CDs, so for now, I'll have to play the physical-to-virtual switch game to connect iso images as CDs or DVDs to this Vista VM.&nbsp; At least my NIC is working.&nbsp; Here's hoping that VMware (or, though probably less likely, Microsoft) manages to fix this annoyance soon.</p>

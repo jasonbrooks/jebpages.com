@@ -1,0 +1,64 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2007-12-04T19:11:48Z
+excerpt: |-
+  Last week I wrote about how the lack of a Linux and open source answer to Microsoft's Active Directory is slowing the spread of desktop Linux.
+
+  Could the Linux and open source answer to Active Directory be Active Directory?
+
+  Today, Likewise Software (the firm formerly known as Centeris) launched a new open source software project that consists of the authentication services core of the firm's Linux-to-Active Directory product, Likewise Enterprise.
+
+  The project, called Likewise Open, is licensed under the GPL and is set for inclusion in the forthcoming Red Hat Enterprise Linux 5.2 and Ubuntu 8.04, with to-be-determined bundling with Novell's SUSE Linux on the way.
+
+  For Likewise Software, the idea is that once organizations get a taste for managing authentication for their Linux desktops via Active Directory, they'll want to trade up for the non-free, Enterprise version of the company's product, which adds support for additional management goodies such as Group Policy.
+
+
+  I think that Likewise Open is a very promising development for Linux in general, and large managed desktop Linux deployments in particular.
+
+  Of course, many Linux-embracing organizations will be reticent about building their infrastructures around Microsoft technology, but with a wholly open source alternative on the horizon in the form of Samba 4, AD may end up being the great directory hope of Linux and open source, after all.
+meta:
+  _publicize_job_id: "15853824903"
+  _wp_old_slug: "2013"
+  original_post_id: "2013"
+published: true
+status: publish
+tags:
+- FE
+title: If You Can't Beat Active Directory, Should You Join It?
+type: post
+url: /2007/12/04/if_you_cant_beat_active_directory_should_you_join_it/
+---
+
+<p>Last week <a href="http://www.eweek.com/article2/0,1895,2222974,00.asp">I wrote about</a> how the lack of a Linux and open source answer to Microsoft's Active Directory is slowing the spread of desktop Linux.</p>
+<p>
+Could the Linux and open source answer to Active Directory be Active Directory?</p>
+<p>
+Today, Likewise Software (the firm formerly known as Centeris) launched a new open-source software project that consists of the authentication services core of the firm's Linux-to-Active Directory product, Likewise Enterprise.</p>
+<p>
+The project, called Likewise Open, is licensed under the GPL and is set for inclusion in the forthcoming Red Hat Enterprise Linux 5.2 and Ubuntu 8.04, with to-be-determined bundling with Novell's SUSE Linux on the way.</p>
+<p>
+For Likewise Software, the idea is that once organizations get a taste for managing authentication for their Linux desktops via Active Directory, they'll want to trade up for the non-free, Enterprise version of the company's product, which adds support for additional management goodies such as Group Policy.</p>
+<p>
+I've <a href="http://www.eweek.com/article2/0,1759,1623597,00.asp">tangled</a> with Linux and Active Directory in the past, and while it's long been possible to join Linux clients to AD domains, the process typically requires more tutorial-following, config file tweaking, and log data spelunking than most organizations wish to undertake.</p>
+<p>
+The Likewise Open site offers ready-to-install packages for OpenSUSE 10.3, Fedora 8 and Ubuntu 7.10. I took Likewise Open for a quick run today by installing the bits on an Ubuntu 7.10 test machine. When I installed the package, my test system pulled down six dependencies required to use the software, including the appropriate Kerberos and Samba bits, as well as some Mono libraries.</p>
+<p>
+I managed to use Likewise Open to join a Windows 2003 Server domain in our lab. The process was definitely easier than I've experienced in the past, although it could have been easier.</p>
+<p>
+I had to modify my DNS configuration to point to my domain, which is typical for AD join operations on any platform, but I also had to forgo my "roaming" network configuration in favor of a static IP setup on my Ubuntu client.</p>
+<p>
+In what I gather is part of the magical, behind-the-scenes massaging required to bring Linux clients into an AD fold, the Likewise Open software restarted the NetworkManager service on my test notebook, thereby interrupting its network connection and stopping the join operation.</p>
+<p>
+Once my Ubuntu client had joined the AD fold, I was able to log onto the system as one of my Active Directory users. I was not, however, able to ssh into my system, and the Likewise Open project page is rather thin on documentation at this point.</p>
+<p>
+In any case, I think that Likewise Open is a very promising development for Linux in general, and large managed desktop Linux deployments in particular.</p>
+<p>
+Of course, many Linux-embracing organizations will be reticent about building their infrastructures around Microsoft technology, but with a wholly open source alternative on the horizon in the form of Samba 4, AD may end up being the great directory hope of Linux and open source, after all.</p>
+<p /></p></p></p></p></p></p>

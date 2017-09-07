@@ -1,0 +1,68 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2015-11-06T15:28:24Z
+meta:
+  _edit_last: "13396443"
+  _publicize_done_12821148: "1"
+  _publicize_done_12821151: "1"
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:12817127;s:57:"https://twitter.com/jasonbrooks/status/662773585275023360";}}
+  _publicize_job_id: "16610714736"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpas_done_12817124: "1"
+  _wpas_done_12817127: "1"
+  _wpas_skip_12817127: "1"
+  _wpas_skip_12817134: "1"
+  _wpcom_is_markdown: "1"
+  geo_address: Ocean Beach, San Francisco, CA, USA
+  geo_latitude: "37.759392"
+  geo_longitude: "-122.510734"
+  geo_public: "1"
+  publicize_google_plus_url: https://plus.google.com/+JasonBrooks0/posts/4wCS45Jrgcm
+  publicize_twitter_user: jasonbrooks
+  sharing_disabled: "1"
+published: true
+status: publish
+tags:
+- blogging
+- markdown
+- middleman
+- wordpress
+title: Cutting out the Middleman, with Wordpress
+type: post
+url: /2015/11/06/cutting-out-the-middleman-with-wordpress/
+---
+
+<p>For the past few years, the only posts I've written in this blog have been about this blog, and this post is no different. I make up for it in lack of volume: I'm averaging about one post a year.</p>
+<p>Two years ago, I <a href="http://jebpages.com/2013/11/06/cutting-in-the-middleman-with-comments/">wrote about</a> how I'd finally (almost) gotten my static blog all set up the way I wanted it, complete with self-hosted, open-source commenting functionality. Yay!</p>
+<p>One year ago, I dumped <a href="http://blog.jebpages.com/blog/2014/11/hello-world/">some quick notes</a> about how I'd re-homed my blog to Github Pages and wired it up to Github's Travis CI service such that pushing posts or updates to my blog's git repo would trigger a build and refresh of my site. Yay!</p>
+<p>Of course, I still had some things to figure out, and while I eventually figured out most of it, I wasn't blogging -- I'd think about my blog, and my thoughts would immediately turn to distraction over hosting and customization and maintenance. If I'm actually going to write here, I should try to make the experience as smooth as possible, with fewer non-writing avenues around to distract me.</p>
+<h2>Middleman Retrospective</h2>
+<p>A few weeks ago, I was reflecting on my too-static blog, and on my general blog desires, which haven't really changed since I switched away from Wordpress:</p>
+<p><em>(listed in order)</em></p>
+<ol>
+<li>I don't want to admin a dynamic web app</li>
+<li>I <a href="http://jebpages.com/2013/09/15/asciidokken/">don't want to</a> write/edit post in HTML</li>
+<li>I want to use open source software</li>
+<li>I want to be able to customize my blog</li>
+<li>I want an easy editing/publishing experience</li>
+<li>I want to maintain commenting support</li>
+</ol>
+<p>With my <a href="https://github.com/OSAS/middleman-springboard">Middleman-based</a> setup, I had point one nailed. Static HTML FTW. Point two, also nailed. I wrote in either AsciiDoc or Markdown. Point three, nailed.</p>
+<p>Point four... not really nailed. Maybe... stapled? Basic customization chores, like figuring out how to add a simple sidebar, took a long time for me to figure out, and each question I answered led to other questions. As I Googled around for answers and fiddled endlessly with CSS, my thoughts often turned to a "retreat" back to Wordpress, with all its point-and-clickitude.</p>
+<p>Point five, the easy publishing experience, also nailed. The git repo to CI to github pages process I set up worked really well, and the middleman blog-writing UI that <a href="https://twitter.com/garrett">Garrett</a> wrote is really awesome.</p>
+<p>Point six I had working, using <a href="https://github.com/phusion/juvia">Juvia comments</a>, which, being open source software, kept me in line with point three, but took me out of compliance with point one -- I didn't want to maintain some dynamic, mysql-backed web application just for my blog, and yet, my Juvia comments instance was just that. And, as a bonus, since I first deployed it, the Juvia project has been orphaned.</p>
+<h2>Wordpress: A New Hope</h2>
+<p>I mentioned above that in dark moments, I felt tempted by a return/retreat to Wordpress. I figured I could use the wordpress.com service, which would satisfy my nothing-to-admin, open source, commenting, and publishing ease requirements. A combination of the many nice-looking, built-in Wordpress themes and widgets, along with the (paid) option of tweaking theme CSS and whatnot, promised to satisfy my customization needs, as well.</p>
+<p>Still, I <em>really</em> didn't want to write posts in HTML, or have to hand-edit the HTML of the Wordpress WYSIWYG editor. I love how markdown can be pasted straight into a email, as plain text, and remain totally readable.</p>
+<p>It turns out that about two weeks after I quit using Wordpress, the project added a <a href="https://en.blog.wordpress.com/2013/11/19/markdown/">"write in markdown"</a> option to the software. You check a box somewhere, and the write-in-HTML tab in the UI becomes a write-in-markdown tab. So, that's point two, nailed.</p>
+<p>I signed myself up for the $99 premium Wordpress subscription, which seems like a lot of money, but comes out to less than my <a href="http://www.wwe.com/wwenetwork">WWE Network</a> and <a href="http://marvel.com/comics/unlimited">Marvel Unlimited</a> subscriptions, and goes to a company that creates and supports open source software, so... I'll give it a year.</p>
+<p>Getting rolling again with Wordpress was easy. I pointed my domain in the right direction, picked out a theme I liked, sucked in most of my old posts from WP backups, converted the very few new ones, and modified my static posts sitting on github pages to redirect permanently over here.</p>
+<p>We'll see how this return to Wordpress, now with markdown support and full SaaSification, affects or does not affect my personal blogging. There's a non-zero chance I'll be back in November 2016 to tell you all about my new LiveJournal odyssey.</p>

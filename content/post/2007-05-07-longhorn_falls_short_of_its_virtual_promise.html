@@ -1,0 +1,35 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2007-05-07T13:26:41Z
+meta:
+  _publicize_job_id: "15853823714"
+  _wp_old_slug: "1985"
+  original_post_id: "1985"
+published: true
+status: publish
+tags:
+- FE
+title: Longhorn Falls Short of its Virtual Promise
+type: post
+url: /2007/05/07/longhorn_falls_short_of_its_virtual_promise/
+---
+
+<p>This week, Microsoft set loose "Longhorn" Server Beta 3, and the release is brimming with evidence of the hard work Microsoft has put into polishing the configuration wizards that work to abstract away the knotty details of the applications and services these interfaces front.</p>
+<p>Of course, the yellow brick road to the configuration wizard isn't the only or best path to abstracting away complexity. Moving forward, the name of the game in IT abstraction is virtualization, a fact that Microsoft has acknowledged by taking steps to make Longhorn play better both as a guest and a host for server virtualization. Based on this late beta, however, it's looking like Longhorn will fall short on its virtualization promises.</p>
+<p>Most glaringly, there's the fact that Longhorn is set to ship without the built-in Windows Hypervisor that initially had been slated to bake virtualization right into Windows Server.</p>
+<p>I think that Microsoft would've done better to have built the open-source Xen hypervisor into Windows rather than to have built its own hypervisor. It seems that since the Xen hypervisor sits in its own layer below its guest instances, Microsoft could've shipped that GNU GPL (General Public License) component while maintaining proprietary licensing for the rest of its operating system.</p>
+<p>Granted, building your own hypervisor is a hefty task, and I'm ready to accept for now that Microsoft has good reason to chart it's own course here, even if that means lagging behind its server OS rivals with integrated virtualization support. What's more puzzling, though, are the holes in Microsoft's strategies for making Longhorn Server a better virtualization guest.</p>
+<p>One of Longhorn's long-expected new features is support for deploying the OS in trimmed down "core" configurations that will reduce overhead and attack surface by leaving out superfluous code.</p>
+<p>Why, for instance, should you have to tell Windows Server not to worry about updating to an Internet Explorer 7 revision that you'll never be running on that machine anyway? These lower-overhead configurations are particularly important for virtualized servers, which spend the bulk of their time running heedlessly.</p>
+<p>However, unlike most Linux distributions, for which you can deploy a minimal configuration and then pull in what components you need to support your applications, Longhorn Core supports only a handful of Windows roles, such as those for file services or Active Directory.</p>
+<p>As a result, you won't be able to deploy your own applications on Longhorn Core, nor will ISVs be able to use Longhorn Core to deploy thin, Windows-based software appliances.</p>
+<p>The relative lack of rigor in Windows' software management framework also means that the new command-line version of Longhorn's server management tool won't work on Longhorn Core because the tool depends on the .Net Framework, and the .Net Framework depends on too broad a swath of the full-blown Windows OS to run on the server core. Microsoft's new command-line interface, PowerShell, won't run on Longhorn Core, either, because PowerShell also depends on the .Net Framework.</p>
+<p>The virtual software appliance approaches now being pushed and facilitated by the likes of rPath and its appliance-producing rBuilder platform, VMware and its VMTN (VMware Technology Network), and Amazon.com and its Elastic Compute Cloud stand a solid chance of displacing the OS as a general-purpose platform model to which Windows Server has been designed to conform.</p>
+<p>I used to think that licensing represented the biggest roadblock to Microsoft's participation in this model, but with the virtualization-friendly changes the company has already made to Windows Server licensing, Microsoft has demonstrated that it's willing to adjust its business models to adapt to new virtual realities. However, without technology changes to match its business moves, Microsoft's going to have a tough time keeping up with Linux in this space.</p></p></p></p></p></p></p>

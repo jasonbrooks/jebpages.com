@@ -1,0 +1,36 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2011-06-02T16:18:11Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15853829655"
+  _thumbnail_id: "4434"
+  _wp_old_slug: "4424"
+  _wpcom_is_markdown: "1"
+  original_post_id: "4424"
+published: true
+status: publish
+tags:
+- FE
+title: Stacking Up OpenStack Distributions
+type: post
+url: /2011/06/02/stacking-up-openstack-distributions/
+---
+
+<p>I<img class="alignright size-medium wp-image-4434" title="openstack" src="{{ site.baseurl }}/assets/openstack-logo1.png?w=300" alt="" width="300" height="300" />'m taking OpenStack for a spin in our lab, with an eye toward kicking off some reviews coverage of the much-talked-about open source project, and, perhaps, to put the cloud operating system into service running eWEEK Labs' test infrastructure.</p>
+<p>I started off my exploration by installing Ubuntu 10.04.2 on a six-core AMD 4000-series server and <a href="http://wiki.openstack.org/NovaInstall/DevInstallScript">running the DevInstallScript</a> offered up on the project's wiki. All went more or less smoothly, until my first instance refused to respond to my ssh connection attempts. Rather than chase down the various networking error messages I found scattered through my server's several screen sessions, I went looking for an OpenStack distribution to ease the testing process.</p>
+<p>I found a few distributions right away:</p>
+<ul>
+<li><a href="http://www.stackops.com/">StackOps</a>, an Ubuntu-based distribution with a handy Web-based deployment interface.</li>
+<li><a href="http://blogs.rpath.com/wpmu/technical-viewpoints/2011/06/01/open-stack-appliance-ready-for-test/">OpenStack Compute appliance</a>, from <a title="rPath Is on the Right Track with X6" href="http://eweeklabs.files.wordpress.com/2011/06/openstack-logo1.pngarchives/rpath-is-on-the-right-track-with-x6">rPath</a>, an informal project that offers the company an opportunity to show off its component-wrangling meddle.</li>
+<li><a href="http://www.eweek.com/c/a/Cloud-Computing/Citrix-Unveils-Project-Olympus-Commercial-Version-of-OpenStack-Cloud-Platform-275917/">Project Olympus</a>, which Citrix announced at its recent Synergy conference.</li>
+</ul>
+<p>So far, I've only just installed the StackOps distro in that single-node configuration. I'm considering booting my test server from a handful of iSCSI root volumes to swap around between the different distros.</p>
+<p>I'm sure there are quite a few other fledgling OpenStack distros out there -- let me know which ones I should add to my eval list.</p>

@@ -1,0 +1,62 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2008-08-13T13:19:52Z
+excerpt: |
+  Our own Scott Ferguson is reporting today on the licensing snafu stemming from the ESX Server 3.5 Update 2 that VMware began shipping on Aug. 1:
+
+  VMware released an alert Aug. 12 to warn customers and partners about problems with an update to the 3.5 version of VMware ESX and ESXi virtualization products. The update is causing disruptions and virtual machines are failing to power on. VMware has posted a temporary fix and is working to fix the update.
+
+  Three things about this on-premises outage jump to mind:
+
+  1. I just missed it. I downloaded this update last Friday, but I hadn't installed it yet on the ESX Server I use for testing in our lab. I've been holding off on upgrading the ESX box from Version 3.0 of the product because the updated version of the Virtual Infrastructure client that the 3.5 release requires regressed on 64-bit Windows compatibility. That regression had since been fixed.
+
+  I'm generally a fan of prompt and even automatic updates--after all, when things go wrong with updates, we can always rely on virtualization to snapshot us back into action. Unless, of course, it's your virtualization platform that gets broken. You win this time, partisans of update conservatism.
+
+  2. Whether you believe they're necessary or not, mechanisms designed to lock you out of the software running on your hardware are a major pain in the ass.
+
+  These things exist solely to enforce the business models of the companies that implement them, and while that's not necessarily a bad thing, vendors better make double sure that the features they employ to enforce their licenses remain as transparent as possible to users.
+
+  General absence of arbitrary lockout mechanisms: another reason to love open-source software.
+
+  3. Catastrophic service outages are not the province of the cloud alone. Looking out at the headlines that Google's been grabbing for its recent Gmail outages, you'd think that no one's self-hosted e-mail or other key services ever went down, or that makers of on-premises software never push down far-reaching failures to their customers.
+
+  Unless you're hosting your own services, writing your own platforms, designing your own hardware, running your own network cables and generating your own electricity, you're subject to the potential mistakes of your trusted providers. We must remind ourselves to plan accordingly.
+meta:
+  _publicize_job_id: "15853826388"
+  _wp_old_slug: "2045"
+  original_post_id: "2045"
+published: true
+status: publish
+tags:
+- FE
+title: VMware Update Shows No Infrastructure Is Immune to Outage
+type: post
+url: /2008/08/13/vmware_update_shows_no_infrastructure_is_immune_to_outage/
+---
+
+<p>Our own Scott Ferguson <a href="http://www.eweek.com/c/a/IT-Infrastructure/VMware-ESX-Update-Causing-Disruptions/">is reporting today</a> on the licensing snafu stemming from the ESX Server 3.5 Update 2 that VMware <a href="http://blogs.vmware.com/vi/2008/08/interesting-ite.html">began shipping on Aug. 1</a>:</p>
+<blockquote><p>VMware released an alert Aug. 12 to warn customers and partners about problems with an update to the 3.5 version of VMware ESX and ESXi virtualization products. The update is causing disruptions and virtual machines are failing to power on. VMware has posted a temporary fix and is working to fix the update.
+</p></blockquote>
+<p>Three things about this on-premises outage jump to mind:</p>
+<p>
+1. I just missed it. I downloaded this update last Friday, but I hadn't installed it yet on the ESX Server I use for testing in our lab. I've been holding off on upgrading the ESX box from Version 3.0 of the product because the updated version of the Virtual Infrastructure client that the 3.5 release requires regressed on 64-bit Windows compatibility. That regression had since been fixed.</p>
+<p>
+I'm generally a fan of prompt and even automatic updates--after all, when things go wrong with updates, we can always rely on virtualization to snapshot us back into action. Unless, of course, it's your virtualization platform that gets broken. You win this time, <a href="http://weblog.infoworld.com/venezia/archives/018156.html">partisans of update conservatism</a>.</p>
+<p>
+2. Whether you believe they're necessary or not, mechanisms designed to lock you out of the software running on your hardware are a major pain in the ass.</p>
+<p>
+These things exist solely to enforce the business models of the companies that implement them, and while that's not necessarily a bad thing, vendors better make double sure that the features they employ to enforce their licenses remain as transparent as possible to users.</p>
+<p>
+General absence of arbitrary lockout mechanisms: another reason to love open-source software.</p>
+<p>
+3. Catastrophic service outages are not the province of the cloud alone. Looking out at the headlines that Google's been grabbing for its recent Gmail outages, you'd think that no one's self-hosted e-mail or other key services ever went down, or that makers of on-premises software never push down far-reaching failures to their customers.</p>
+<p>
+Unless you're hosting your own services, writing your own platforms, designing your own hardware, running your own network cables and generating your own electricity, you're subject to the potential mistakes of your trusted providers. We must remind ourselves to plan accordingly.</p>
+<p /></p></p></p></p></p>

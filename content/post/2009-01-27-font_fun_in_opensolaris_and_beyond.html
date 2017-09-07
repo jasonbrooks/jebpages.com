@@ -1,0 +1,81 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2009-01-27T18:37:11Z
+excerpt: Among the rougher edges I've found during my recent OpenSolaris tests has
+  been system's font rendering within the Firefox Web browser. Many of the pages I
+  come across on the Internet render with chunky, pixelated looking fonts that remind
+  me of Linux+Mozilla back when I was a fresher-faced analyst based out of eWEEK's
+  one-time Medford location on the shores of the Mystic River.
+meta:
+  _publicize_job_id: "15853827922"
+  _wp_old_slug: "2072"
+  original_post_id: "2072"
+published: true
+status: publish
+tags:
+- FE
+title: Font Fun in OpenSolaris and Beyond
+type: post
+url: /2009/01/27/font_fun_in_opensolaris_and_beyond/
+---
+
+<p>
+For the past few weeks, I've been running <a href="http://www.opensolaris.com/">OpenSolaris 2008.11</a> on my main work notebook, in part because I'm working on a review of the OS, and in part because Linux's rough edges have grown a bit smooth to support the desktop tweaking and fiddling with which I like to sidetrack myself.</p>
+<p><span class="mt-enclosure mt-enclosure-image" style="display:inline;"><img alt="roughfont.png" src="{{ site.baseurl }}/assets/roughfont.png" width="344" height="272" class="mt-image-right" style="float:right;margin:0 0 20px 20px;" /></span><br />
+One of the roughest edges I've found on my OpenSolaris installation is the system's font rendering within the Firefox Web browser. Many of the pages I come across on the Internet render with chunky, pixelated looking fonts that remind me of Linux+Mozilla back when I was a fresher-faced analyst based out of eWEEK's one-time Medford location on the shores of the Mystic River.</p>
+<p>
+The typical prescription for bad-looking Firefox fonts is a visit, within Firefox, to the Advanced Fonts dialog that lives at Edit-&gt; Preferences-&gt; Content-&gt; Fonts&amp;Colors-&gt; Advanced, where you can bar Web pages from using any fonts but the particular San Serif, Serif, and Monospace font trio you ordain. I never like to do this, however, because this workaround tends to break Web page designs, squeezing and reshuffling everything as if you were browsing on a device with a too-small display.</p>
+<p>
+Desirous of smoother-looking fonts, without page layout corruption, I hit the Internet in search of other OpenSolaris users who'd shared my complaint. I found a few references to the lack of font rendering magic in the Freetype library that ships with OpenSolaris.</p>
+<p>
+Due to <a href="http://www.freetype.org/patents.html">potential conflicts with patents</a> held by Apple and by Microsoft, the Freetype project ships its namesake library with subpixel rendering  and its bytecode interpreter switched off. Apparently, certain savvy OpenSolaris users compile their own Freetype libraries to route around this patent tomfoolery, and so that's so what I did -- although to no avail.</p>
+<p>
+I couldn't discern much of a difference with my recompiled library, except for much-worse looking fonts in <a href="http://www.eweek.com/c/a/Virtualization/Sun-VirtualBox-a-Solid-Alternative-to-VMware-Parallels/">VirtualBox</a>, which is based on the Qt framework, where the rest of the GNOME-based OpenSolaris desktop is built out of GTK.</p>
+<p>
+As far as I could tell, my problems boiled down to having and using the right fonts. Most Web pages specify the fonts they want to use, and in many cases, the specified fonts are ones that aren't available on Linux or OpenSolaris, at least not available out of the box. For instance, Google wants to use Arial, a Microsoft font that's freely downloadable, but that carries certain redistribution restrictions that make it tough to bundle with open source operating system distributions.</p>
+<p>
+On Ubuntu and other Linux distributions, there's a package called msttcorefonts, which includes a script for downloading a core set of Microsoft fonts from their <a href="http://corefonts.sourceforge.net/">approved home</a> at Sourceforge, one by one, and then extracting the fonts from their EXE archives using a separate utility called cabextract.</p>
+<p>
+There doesn't appear to be any such package available for OpenSolaris at this time, but it's relatively easy to copy the Microsoft fonts you need over to the .fonts directory in your home folder, and then view the Web, for the most part, as its designers intended.</p>
+<p>
+Alternatively, there's a set of fonts that emulate Arial, Times New Roman, and Courier New well enough so that document and Web page layouts designed with the horizontal sizes of these fonts in mind will come out looking as intended.</p>
+<p>
+These fonts, dramatically dubbed <a href="https://fedorahosted.org/liberation-fonts/">Liberation Sans, Liberation Serif, and Liberation Mono</a>, were made available in 2007 by Red Hat, but have been limited somewhat in their usefulness by the fact that Web pages aren't calling for Liberation Sans, they're calling for Arial or Helvetica. As I mentioned earlier, you can force Firefox to use the libre trio for all pages, but not all pages are designed with Arial, Times New Roman, and Courier in mind.</p>
+<p>
+I imagined that there must be some sort of font substitution option available for OpenSolaris and for Linux, and, sure enough, <a href="http://www.fontconfig.org/fontconfig-user.html">there is</a>. You can place a file, named .fonts.conf, in your home directory, stocked with font-blocking and font-replacement instructions.</p>
+<p>
+The file below, for instance, will block the font Arial and replace it with Liberation Sans:</p>
+<p>
+<span>&lt;?xml version="1.0"?&gt;<br />
+&lt;!DOCTYPE fontconfig SYSTEM "fonts.dtd"&gt;<br />
+&lt;fontconfig&gt;<br />
+&lt;selectfont&gt;<br />
+&nbsp;&nbsp; &lt;rejectfont&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp; &lt;pattern&gt;&lt;patelt name="family"&gt;&lt;string&gt;Arial&lt;/string&gt;&lt;/patelt&gt;&lt;/pattern&gt;<br />
+&nbsp;&nbsp; &lt;/rejectfont&gt;<br />
+&nbsp;&lt;/selectfont&gt;</p>
+<p>&nbsp;&lt;alias&gt;<br />
+&nbsp;&nbsp; &lt;family&gt;Arial&lt;/family&gt;<br />
+&nbsp;&nbsp; &lt;prefer&gt;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;family&gt;Liberation Sans&lt;/family&gt;<br />
+&nbsp;&nbsp; &lt;/prefer&gt;<br />
+&nbsp;&lt;/alias&gt;<br />
+</span><span>&lt;/fontconfig&gt;</span></p>
+<p>
+You can paste in additional sections of the file to mandate other font swaps, and this trick works just as well on Linux as on OpenSolaris.</p>
+<p>
+Now, even after I'd liberated the Liberation fonts, my OpenSolaris font adventures were not quite at an end. That's because many of the pages I encountered during my time with OpenSolaris mandated the font Lucida, which ships with OpenSolaris, but which rendered horribly for me no matter what I did.</p>
+<p>
+To make matters worse, many Sun employee blogs specify Lucida as their font. I imagine that Lucida renders beautifully on the OS X notebooks on which most folks at Sun appear to do their computing, but on Sun's own OpenSolaris, the font is a mess.</p>
+<p>
+Strangely enough, at least a third or so of the fonts available for use on OpenSolaris through the GNOME font-setting dialog rendered very poorly on my test system. However, unglamorous chores like culling ill-suited fonts from your distribution (Ubuntu, for instance, does not ship with Lucida) is one of the honing and tightening processes that a young distribution mustundergo.
+<p>
+Fortunately, banishing Lucida was easy enough to do on my own, with my now-trusty .fonts.conf file.</p>
+<p /></p></p></p></p></p></p></p></p></p>

@@ -1,0 +1,42 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-08-04T10:08:21Z
+meta:
+  _edit_last: "13396443"
+  _oembed_eb67b24b090fc492cb545ff67a38a5dc: '{{unknown}}'
+  _publicize_job_id: "15856510734"
+  _wp_old_slug: "358"
+  original_post_id: "358"
+published: true
+status: publish
+tags:
+- fedora
+- ovirt
+- screencast
+title: Screencasting oVirt
+type: post
+url: /2012/08/04/screencasting-ovirt/
+---
+
+<p>There's work underway over at the oVirt Project to <a href="http://wiki.ovirt.org/wiki/Screencasts">produce some screencasts</a> of the open source virtualization management platform in action. Since you can find oVirt in action each day in my home office, I set out to chip in and create an oVirt screencast, using tools available on my Fedora 17 desktop.</p>
+<p>Here's the five minute screencast, which focuses on creating VMs on oVirt, with a bit of live migration thrown in:</p>
+<p>[youtube=http://www.youtube.com/watch?v=C4gayV6dYK4]</p>
+<p>The first step was getting my oVirt test rig into shape. I'm running oVirt 3.1 on a pair of machines: a quad core Xeon with 16GB of RAM and a couple of SATA disks, and my Thinkpad X220, with its dual core processor and 8GB of RAM. I've taken to running much of my desktop-type tasks on a virtual machine running under oVirt, thereby liberating my Thinkpad to serve as a second node, for live migration and other multi-node-needin' tests. Both machines run the 64-bit flavor of Fedora 17.</p>
+<p>For storage, I've taken to using a pair of Gluster volumes, with bricks that reside on both of my oVirt nodes, which consume the storage via NFS. I also use a little desktop NAS device, an Iomega StorCenter ix2-200, for hosting install images and iSCSI disks.</p>
+<p>For the screencasting, I started out with the <a href="https://live.gnome.org/GnomeShell/Features#Screencast_Recording">desktop record feature</a> that's built into GNOME Shell. It's really easy to use, hit control-shift-alt R to start recording, and the same combo to stop. After a couple of test recordings, however, I found that when I loaded the WebM-formatted video files that the GNOME feature produces into a video editor (I tried with <a href="http://www.pitivi.org/">PiTiVi</a> and with <a href="http://www.openshotvideo.com/">OpenShot</a>) only the first second of the video would load.</p>
+<p>Rather than delve any deeper into that mystery, I swapped screencasting tools, opting for <a href="http://recordmydesktop.sourceforge.net/about.php">gtk-recordMyDesktop</a> (yum install gtk-recordmydesktop), which produces screencasts, in OGV format, that my editing tools were happy to import properly.</p>
+<p>I started out editing with PiTiVi--I didn't intend to do too much editing, but I did want to speed up the video during parts of the recording that didn't directly involve oVirt, such as the installation process for the <a href="http://www.turnkeylinux.org/wordpress">TurnKeyLinux Wordpress appliance</a> I used in the video. I was aiming for no more than five minutes with this, and I hate it when screencasts include a bunch of semi-dead space. I found, however, that PiTiVi doesn't offer this feature, so I switched over to OpenShot, which is available for Fedora in the <a href="http://rpmfusion.org/Configuration/">RPM Fusion</a> repositories.</p>
+<p>I played back my recording in the OpenShot preview window, and when I came to a spot where I wanted to speed things up, I made a cut, played on to the end of the to-be-sped section, and made a second cut, before right clicking on the clip, choosing how much to accelerate it, and then dragging the following bit of video back to fill the gap.</p>
+<p>However, I found that my cuts were getting out of sync--I'd zoom in to frame-by-frame resolution, make my cut exactly where I wanted it, and then when I watched it back, the cut wasn't where I'd made it. I don't know if it was an issue with the cut, or a problem with the preview function, but again, I didn't want to delve too deeply here, so I asked the Great Oracle of Google what the best video format was for use with OpenShot. MPEG4, it answered, in the ragged voice of some forum post or something.</p>
+<p>Fine. Back to the command line to install another tool: Transmageddon Video Converter. I know that you can do anything with ffmpeg on the command line, but I find the GUI-osity of Transmageddon, which I've used at some point in the past, easier than searching around for the correct ffmpeg arguments. So, bam, from OGV to MP4, and, indeed, OpenShot appeared to prefer the format swap. My cuts worked as expected.</p>
+<p>I ended the video with a screen shot from the oVirt web site, stretched over a handful of seconds, and I exported the video, sans audio, for the narration step in the process. I played the video back in GNOME Mplayer (for some reason, my usual video player, Totem, kept crashing on me) and used <a href="http://audacity.sourceforge.net/">Audacity</a> (an absolutely killer piece of open source software, with support for Linux, Win and OS X) to record my audio. I used the microphone on my webcam--not exactly high end stuff--which picked up some annoying background noise.</p>
+<p>Fortunately, Audacity comes with a pretty sweet noise removal feature--you highlight a chunk of audio with no other sound but the background noise, and tell Audacity to excise that noise from the whole recording. I thought it worked pretty well, considering.</p>
+<p>With my audio exported (I chose FLAC) I brought it into OpenShot, did a bit of dragging around to sync things right, extended the video chunks at beginning and the end of the piece to make way for my opening and closing remarks, and exported the thing, opting for what OpenShot identified as a "Web" profile. I uploaded the finished screencast to YouTube, and <a href="http://www.youtube.com/watch?v=C4gayV6dYK4">there it is</a>.</p>
+<p><img class="aligncenter size-full wp-image-368" title="ovirt-youtube" src="{{ site.baseurl }}/assets/ovirt-youtube.png" alt="" width="497" height="364" /></p>

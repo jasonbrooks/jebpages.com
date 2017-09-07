@@ -1,0 +1,39 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2008-10-01T12:44:57Z
+excerpt: |-
+  Recently, Cameron Sturdevant and I waded into the world of application whitelisting--a set of products and technologies aimed at ensuring the integrity of Windows clients by enforcing control over which applications are allowed to run.
+  I think that whitelisting, when combined with diligent paring of user and application privileges, can go a long way toward granting workers leave to worry less about whether they are "security idiots" (to borrow a bit of Jim Rapoza's phraseology) and focus more on getting their jobs done.
+  However, where Web-based applications are concerned, the client security road map is much less clear, and, as Jim points out in his column this week on clickjacking, there's no shortage of new Web-based routes through which code-wielding ne'er-do-wells can exploit our machines ...
+meta:
+  _publicize_job_id: "15853826544"
+  _wp_old_slug: "2049"
+  original_post_id: "2049"
+published: true
+status: publish
+tags:
+- FE
+title: Toward a More Idiot-Proof Internet
+type: post
+url: /2008/10/01/toward_a_more_idiotproof_internet/
+---
+
+<p>Recently, Cameron Sturdevant and I waded into the world of <a href="http://www.eweek.com/c/a/Security/Application-Whitelisting-Gains-Traction/">application whitelisting</a>--a set of <a href="http://www.eweek.com/c/a/Security/CA-HIPS-Has-Its-Issues/">products</a> and <a href="http://www.eweek.com/c/a/Security/Bit9-Parity-41-Protects-Windows-Systems/">technologies</a> aimed at ensuring the integrity of Windows clients by enforcing control over which applications are allowed to run.</p>
+<p>I think that whitelisting, when combined with diligent paring of user and application privileges, can go a long way toward granting workers leave to worry less about whether they are "<a href="http://www.eweek.com/c/a/Security/Idiocy-Imperils-the-Web/">security idiots</a>" (to borrow a bit of Jim Rapoza's phraseology) and focus more on getting their jobs done.</p>
+<p>However, where Web-based applications are concerned, the client security road map is much less clear, and, as Jim points out in his column this week <a href="http://etech.eweek.com/content/security/powerless_over_clickjacking.html">on clickjacking</a>, there's no shortage of new Web-based routes through which code-wielding ne'er-do-wells can exploit our machines.</p>
+<p>As I've <a href="http://blogs.eweek.com/brooks/content/security/getting_more_from_firefox_from_chrome.html">written recently</a>, today's Web browsers lack the plumbing to support the same sort of interapplication isolation that full-blown operating systems provide, but projects such as Google's Chrome indicate that we're at least moving in the right direction.</p>
+<p>Less promising is the current state of affairs around whitelisting on the Web. Application whitelisting relies on knowing where the code you run on your clients comes from, and opting to trust or not trust these code sources.</p>
+<p>On a client PC, even one with a large number of installed applications, it's not too tough to go through and make reasonably informed decisions about which code to trust. On a Web page, this sort of trust audit is immensely more challenging, as snippets of script come from all over the place.</p>
+<p>Load up the NoScript extension for Firefox (which implements script whitelisting) and take a browse through your typical array of sites; you'll find scripts and objects from Web analytics firms, advertising companies, providers of social networking widgets and numerous other partner firms.</p>
+<p>It would be nice to assume that the Web locations you've chosen to visit--and, therefore, to trust--monitor the assemblage of content, counters and ads as seriously as does your software vendor, but I can't believe this is the case.</p>
+<p>We may need to move away from the Frankenstein-ian nature of today's Web and introduce more control, more coherence and more specialization into the distribution end of the Web apps model--sort of a UPS or FedEx for Web apps.</p>
+<p>These distributors could gather together all the elements that constitute a Web application, apply sound vetting practices and serve them up under common domains, preferably along with an SSL certificate.</p>
+<p>I'm not calling for an end to the open Internet, but I admit that the rise of a trusted tier of sites could have a chilling effect on those outside of the system.</p>
+<p>However, unless we get a handle on the sources of our Web applications, the promising cross-platform application model that the Web can enable will have a tough time thawing the OS monoculture that defines today's client computing landscape.</p></p></p></p></p></p></p>

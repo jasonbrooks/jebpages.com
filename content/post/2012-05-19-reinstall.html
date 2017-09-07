@@ -1,0 +1,32 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2012-05-19T09:10:06Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15856510382"
+  _wp_old_slug: "274"
+  original_post_id: "274"
+published: true
+status: publish
+tags:
+- fedora
+- fonts
+- patent
+- ubuntu
+title: reinstall
+type: post
+url: /2012/05/19/reinstall/
+---
+
+<p>I reinstalled Fedora 17 on my main work machine yesterday -- I was having weird issues with gnome-boxes and virt-manager, and thought my problems might have stemmed from the weird libvirt machinations I undertook to get <a title="oVirt or No Virt: Notebook Edition" href="http://blog.jebpages.com/archives/ovirt-or-no-virt-notebook-edition/">oVirt running on my laptop</a> w/o disabling NetworkManager.</p>
+<p>I always keep my home directory in a separate partition to allow for easy clean installs w/o losing my data, but this time around I copied my home directory off to a separate drive to start completely fresh -- I'll ferry needed files and folders back as needed.</p>
+<p>One thing I had to go recreate on my new install was a set of tweaks for providing decent font rendering on Fedora. Without these steps, fonts render pretty poorly. I follow the <a href="http://blog.andreas-haerter.com/2011/07/18/tune-improve-fedora-fonts-typeface-ubuntu-like-sharp-fonts">steps in this blog post</a> to mimic Ubuntu's font rendering options, and then create the <a href="http://bbs.archbang.org/viewtopic.php?pid=1817#p1817">.fonts.conf file described here</a> to cajole Google Chrome into obeying the rules laid out in the former step.</p>
+<p>I hereby remind myself to look into exactly why it is that the patent fear fairies that prompt Fedora to ship with a crappy-looking font config don't equally menace Ubuntu. I realize that <a title="working for The (shadow) Man" href="http://blog.jebpages.com/archives/working-for-the-shadow-man/">my employer</a>, with its relatively deeper pockets, presents a more attractive lawsuit target compared to Ubuntu's sponsor, but if Fedora were to shun every piece of potentially patent encumbered software, there'd be no Fedora at all.</p>
+<p>Where to draw the line?</p>

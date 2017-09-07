@@ -1,0 +1,52 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2010-11-15T14:16:36Z
+meta:
+  _publicize_job_id: "15853828850"
+  _wp_old_slug: "2250"
+  original_post_id: "2250"
+published: true
+status: publish
+tags:
+- FE
+title: Fedora's NOTABUG Bug Gives Linux Users a "You're Holding it Wrong" Moment of
+  Their Own
+type: post
+url: /2010/11/15/fedoras_notabug_bug_gives_linux_users_a_youre_holding_it_wrong_moment_of_their_own/
+---
+
+<p>About four years ago, I wrote a blog post (since lost, apparently, to the sands of blog platform migration) entitled "What Is Fedora's Prime Directive?" At issue, more or less, was whether it was appropriate for the Fedora project to push an Xorg modification that stood to deliver benefits to users of open source graphics drivers at the cost of disrupting the systems of closed-source graphics driver users.</p>
+<p>
+Less important to me than the particulars of that issue was the way the project reacted to the problem, and what the dustup meant for the ongoing questions around the mission of Fedora. While that particular dustup is long gone, some of the basic questions remain, as highlighted last week in a flareup around a particular <a href="https://bugzilla.redhat.com/show_bug.cgi?id=638477">Fedora 14 bug</a> involving Adobe's Flash plugin.</p>
+<p>
+In short, the developers behind the glibc C library project on which most, if not all Linux distributions depend changed its implementation of a particular function in pursuit of potential performance benefits on certain processors. The change, while in keeping with the intended, and well-documented, use of the function, caused problems for various sloppily-coded software components, most prominent of which was Flash.</p>
+<p>
+A bug was filed by a Fedora user who experienced problems with Flash on Fedora 14, and several other users who encountered it, among them Linus Torvalds himself, chimed in on the discussion. Also, many tweets were fired to and fro on the issue, though I don't think anyone offered up a pithy hashtag on the subject for our convenience.</p>
+<p>
+You can check out this short youtube video I recorded to see the issue in action. In the video, I'm running a brand-new instance of Fedora 14 64-bit from the project's LiveCD, I cruise to Red Hat's Web site, I encounter content that requires Flash to view, install Flash, and hit the issue called out in the bug report. You'll need to have your sound turned on--this is an audio issue. The borked sound begins about halfway through.</p>
+<p>
+[youtube http://www.youtube.com/watch?v=L9hywXahS9s&amp;fs=1&amp;hl=en_US&amp;rel=0]</p>
+<p>
+The bug itself was marked: CLOSED NOTABUG, with the rationale being that the developers of the Flash applet and other affected applications were in the wrong for using this function inappropriately, so it was their problem, not Fedora's problem. Simple. Done and done.</p>
+<p>
+Of course, part of the point of a Linux distribution is that it acts as a buffer between upstream projects and individual users. Yes, we could all roll our own Linux-based OSes from thousands of different open source projects, and deal with the integration ourselves, but performing these chores is how Red Hat earns its money, and it's how Fedora--while a free, community-supported project rather than a product--earns its mindshare.</p>
+<p>
+That is, of course, unless what many Fedora critics have long claimed is true--that Fedora is simply a bleeding-edge test bed for the release that Red Hat gets paid for, and that Red Hat would not likely push out into the world with a broken Flash implementation--regardless of who was to blame for the brokenness.</p>
+<p>
+It's perfectly fine for Fedora to be just such a distribution--YMMV, caveat "emptor," etc. However, the Fedora Project projects itself as much more than this. Here's the tag line from the fedoraproject.org Web site:</p>
+<blockquote><p>Fedora is a fast, stable, and powerful operating system for everyday use built by a worldwide community of friends. It's completely free to use, study, and share.</p></blockquote>
+<p>
+I don't mean to suggest that the Fedora project or Red Hat is acting in bad faith, or hiding at all its true intentions. Rather, the explanation now, as in past years, seems to me to be that as an open source project, Fedora houses a mixture of the attitudes and motivations of its contributors, with a tilt toward those of Red Hat, as Red Hat is the project's biggest presence.</p>
+<p>
+For Red Hat, it makes sense to push the envelope with Fedora, and to allow its slower-moving enterprise releases to benefit from what often amounts to creative destruction in the Fedora cycles.</p>
+<p>
+Now, less clear to me is whether this arrangement pays adequate dividends for individual backers and users of Fedora (who may want to use Flash without implementing wacky workarounds), particularly given the presence of plenty of Fedora alternatives. Fortunately for those individuals, the switching costs between different Linux distribution options are fairly low, so they can vote with their feet.</p>
+<p>
+Check out my <a href="http://www.eweek.com/c/a/Linux-and-Open-Source/Red-Hats-Fedora-14-Boasts-Updated-Development-Tools-New-Virtualization-Technology-784875/">review of Fedora 14</a>, and if you're in the mood for a walk down memory lane, take a peek at this slide gallery we created of <a href="http://www.eweek.com/c/a/IT-Infrastructure/Red-Hats-Fedora-Linux-13-Releases-of-CuttingEdge-Open-Source-173541/">the first 13 Fedora Linux releases</a>.</p></p></p></p></p></p></p></p>

@@ -1,0 +1,57 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2017-04-11T17:08:31Z
+meta:
+  _publicize_job_id: "3894515382"
+  _rest_api_client_id: "-1"
+  _rest_api_published: "1"
+  _wpas_skip_12817127: "1"
+  _wpas_skip_12818529: "1"
+  _wpcom_is_markdown: "1"
+published: true
+status: publish
+tags:
+- atomic
+- fedora
+- kubernetes
+title: testing system-containerized kube and friends
+type: post
+url: /2017/04/11/testing-system-containerized-kube-and-friends/
+---
+
+<p>A month or so ago I jotted down <a href="https://jebpages.com/2017/03/17/test-containerized-kube-and-system-container-based-flannel-and-etcd/">some notes</a> on using ansible to set up a kubernetes cluster on atomic hosts with kubernetes running in regular docker containers and flannel and etcd running in <a href="http://www.projectatomic.io/blog/2016/09/intro-to-system-containers/">system containers</a>.</p>
+<p>I've been working on turning my kube containers into system containers. Three reasons jump to mind:</p>
+<ul>
+<li>I want to run my kube containers via systemd, and system containers come with systemd unit files rolled in and deployed automatically when you run <code>atomic install --system foo</code>, as opposed to storing them somewhere separate from the containers, and copying them into place.</li>
+<li>I'm using flannel and etcd system containers, in part because flannel needs to modify docker's configs to do its thing, and etcd needs to be running for flannel to run, so there's a bit of a chicken-and-egg situation that we avoid by running flannel and etcd outside of docker. I can save on a bit of storage by having flannel, etcd and kubernetes all share the same image in the ostree-based storage that system containers use.</li>
+<li>I've been wanting to learn more about system containers for a little while now, and <a href="https://github.com/yuqi-zhang">Yu Qi (Jerry) Zhang</a> just wrote this <a href="https://fedoraproject.org/wiki/Container:System_Container">system container howto</a>.</li>
+</ul>
+<p>I've been testing on a trio of fedora atomic hosts like this:</p>
+<p>[code lang="text"]<br />
+$ git clone https://github.com/jasonbrooks/contrib.git<br />
+$ cd contrib<br />
+$ git checkout system-containers<br />
+$ cd ansible<br />
+$ vi inventory/inventory</p>
+<p>[masters]<br />
+kube-master-test.example.com</p>
+<p>[etcd:children]<br />
+masters</p>
+<p>[nodes]<br />
+kube-minion-test-[1:2].example.com</p>
+<p>$ cd scripts<br />
+$ ./deploy-cluster.sh<br />
+[/code]</p>
+<p>Substitute those hostnames above with ones that match your own test machines. Alternatively, you should be able to use the Vagrantfile in the <code>vagrant</code> directory of that repo, though I haven't tested that yet.</p>
+<p>This involves a <a href="https://github.com/kubernetes/contrib/compare/master...jasonbrooks:system-containers">bunch of changes</a> to run commands like <code>atomic install --system --name etcd {{ container_registry }}/{{ container_namespace }}/etcd:{{ container_label }}</code> to install flannel, etcd and kubernetes master and node components if desired and specified in the <code>inventory/group_vars/all.yml</code> file.</p>
+<p>In that same config file, I've temporarily turned off some of the newish encrypted flannel stuff, because I need to tweak the flannel container to make it work.</p>
+<p>If you run the script as laid out above, you'll get <a href="https://github.com/jasonbrooks/atomic-system-containers/tree/kube-containers">etcd, flannel and kube containers</a> from my namespace in the docker hub, because the current upstream fedora containers, in the case of etcd and flannel, need a couple of changes, and in the case of kube, the upstream fedora containers (that I maintain) aren't yet modified to run as system containers.</p>
+<p>Speaking of which, another cool thing about system containers is that they can be run as regular docker containers. To test whether my new system containers would run as regular docker containers, I ran through the steps I mentioned in <a href="https://jebpages.com/2017/03/17/test-containerized-kube-and-system-container-based-flannel-and-etcd/">my previous post</a>, with a different branch of ansible modded to run kube in regular docker containers, but in the <code>all.yml</code> conf file, I set <code>container_registry: docker.io</code> and <code>container_namespace: jasonbrooks</code> and <code>container_label: fc25</code> to grab the system container versions of everything that I've been talking about in this post. It worked.</p>
+<p>So, yay. I have a couple items to work through still. There's the flannel bit I mentioned above (I think I just need to mount another dir in the flannel system container's <code>config.json.template</code>). Also, I've been needing to restart the <code>kubelet</code> service again in my nodes before the <code>kubedns</code> pod would work, so I need to track down where in the ansible that needs to happen to make it automatic.</p>

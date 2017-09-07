@@ -1,0 +1,60 @@
+---
+author:
+  display_name: Jason Brooks
+  email: jason@sealrock.net
+  first_name: ""
+  last_name: ""
+  login: jebpages
+categories:
+- post
+date: 2013-09-19T11:36:55Z
+meta:
+  _edit_last: "13396443"
+  _publicize_job_id: "15858732072"
+  _wp_old_slug: "550"
+  _wpcom_is_markdown: "1"
+  geo_public: "0"
+  original_post_id: "550"
+published: true
+status: publish
+tags: []
+title: "\uFEFF\uFEFF\x4D\x6F\x72\x65\x20\x41\x73\x63\x69\x69\x44\x6F\x6B\x6B\x65\x6E"
+type: post
+url: /2013/09/19/%ef%bb%bf%ef%bb%bfmore-asciidokken/
+---
+
+<p>A sort of funny thing happened when I was posting my last post, AsciiDokken, about how I’ve been writing and (not)blogging in AsciiDoc, and piping posts up into Wordpress via blogpost.py.</p>
+<div>
+<p>The dang post wouldn’t upload!</p>
+</div>
+<div>
+<p>I retried it, several times, and eventually it worked. I’m wondering if the issue I experienced has something to do with the recent Wordpress 3.6.1 update.</p>
+</div>
+<div>
+<p>Anyhow, it occurred to me that one thing Wordpress does pretty well is accept pasted HTML content, and more or less, accurately suck in the HTML formatting.</p>
+</div>
+<div>
+<p>I mentioned in my post that I was using this live preview trick suggested on the AsciiDoctor web site to do my live-previewing. Well, I’ve come across a simpler way to live preview, using a Chrome extension for the purpose. There’s also a Firefox plugin.</p>
+</div>
+<div>
+<p>I installed the Asciidoctor.js Live Preview plugin, right-clicked on the red "A" that then appeared on my toolbar, and clicked the check box next to "Allow access to file URLs."</p>
+</div>
+<div>
+<p>I browsed, in Chrome, to the directory where I keep my in-progress writings, and used the "Create Application Shortcuts" function under "Tools" to convert my directory listing tab into its own app launcher.</p>
+</div>
+<div>
+<p>Then, I hit the command line and visited my "~/.local/share/applications/" directory in search of the launcher file Chrome created (it begins with "chrome-").</p>
+</div>
+<div>
+<p>I tacked "--allow-file-access --enable-apps" onto the end of the line beginning "Exec=", changed the line beginning "Name=" to include a suitable name, and changed the line beginning "Icon=" to point to a suitable icon for my app:</p>
+<p><img class="aligncenter size-full wp-image-552" src="{{ site.baseurl }}/assets/adoc-icon.png" alt="adoc-icon" width="400" height="256" /></p>
+</div>
+<div></div>
+<div>
+<p>Then, when I want to write, I pop open my text editor of choice, open up my new live preview Web app, write, and see my words appear in all their AsciiDoc-formatted glory:</p>
+<p><img class="aligncenter size-full wp-image-551" src="{{ site.baseurl }}/assets/live-preview.png" alt="live-preview" width="400" height="246" /></p>
+</div>
+<div></div>
+<div>
+<p>When it’s time to publish, I can either use blogpost.py (which, as I’ve mentioned in the past, handily handles image uploading, but, as I’ve mentioned today, is caught up in some amount of brokenness), or just highlight what’s in my live preview and dump it into Wordpress, before manually uploading the images.</p>
+</div>
