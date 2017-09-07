@@ -4,7 +4,7 @@ title = "jebpages"
 theme = "licorice"
 relativeURL = true
 
-[Author]
+[params]
   name = "Jason Brooks"
   #email = "xxxxxxx"
   #facebook = "username"
