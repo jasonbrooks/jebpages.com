@@ -5,7 +5,7 @@ theme = "licorice"
 relativeURL = true
 
 [params]
-  name = "Jason Brooks"
+  author = "Jason Brooks"
   #email = "xxxxxxx"
   #facebook = "username"
   #googleplus = "+username" # or xxxxxxxxxxxxxxxxxxxxx
